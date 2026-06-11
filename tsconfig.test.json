@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "types": ["jest","node"],
+    "paths": {
+      "@renderer/*": [
+        "./src/renderer/*"
+      ],
+      "@main/*": [
+        "./src/main/*"
+      ],
+      "@utils/*": [
+        "./utils/*"
+      ],
+      "@shared/*": [
+        "./src/shared/*"
+      ]
+    }
+  },
+  "include": ["**/spec","spec"]
+}
