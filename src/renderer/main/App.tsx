@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import { SecureStorage } from './lib/storage'
@@ -26,23 +26,33 @@ export default function App() {
       return getData(data)
     }
   })
+  const currentLoading = useRef(false)
   const mutateLogin = useMutation({ mutationFn: login })
-  const handleLogin = async (data: LoginBodyData, save: boolean) => {
-    console.log('YEEEEEEEEEEEEEES')
+  const handleLogin = async (data: LoginBodyData, password: string, save: boolean) => {
+    console.log('login success')
+    if (save)
+      SecureStorage.saveCredentials(data.subscriber.servNumber.slice(3), {
+        subscriberId: data.subscriber.subscriberId,
+        token: data.uToken,
+        acctId: data.subscriber.accountId,
+        custId: data.subscriber.custId,
+        password: password
+      } as SavedData)
     const savedData = await getDashBoardData.mutateAsync({
       subscriberId: data.subscriber.subscriberId,
       token: data.uToken,
       acctId: data.subscriber.accountId,
       custId: data.subscriber.custId
     })
-    if (save) SecureStorage.saveCredentials(data.subscriber.servNumber.slice(3), savedData)
     setSession({ data: savedData, isLoggedIn: true })
   }
   useEffect(() => {
     // Check for saved session on mount
     const checkSession = async () => {
+      currentLoading.current = true
       const saved = await SecureStorage.getSavedCredentials<SavedData>()
       if (saved.success) {
+        console.log('loaded', saved)
         getDashBoardData
           .mutateAsync({ ...saved.data! })
           .then((data) => {
@@ -52,16 +62,21 @@ export default function App() {
             })
           })
           .catch(async () => {
+            console.log('login')
             const data = await mutateLogin.mutateAsync({
               number: saved.username!,
               password: saved.data!.password
             })
-            handleLogin(data, true)
+            handleLogin(data, saved.data!.password, true)
+          })
+          .finally(() => {
+            currentLoading.current = false
           })
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
 
-    checkSession()
+    if (!currentLoading.current) checkSession()
   }, [])
 
   const handleLogout = async () => {
@@ -71,7 +86,7 @@ export default function App() {
     })
   }
 
-  if (getDashBoardData.isPending) {
+  if (getDashBoardData.isPending || mutateLogin.isPending) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
@@ -87,14 +102,14 @@ export default function App() {
       {/* Background decoration to match the new blue theme */}
       <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[100px] opacity-20"></div>
       <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-slate-200 rounded-full blur-[100px] opacity-20"></div>
-
       <div className="relative z-10 flex-1 overflow-hidden flex flex-col">
         {session.isLoggedIn ? (
           <Dashboard onLogout={handleLogout} demoData={demoData} />
         ) : (
           <Login
-            onLogin={(data, save) => {
-              return handleLogin(data, save)
+            error={mutateLogin.error || getDashBoardData.error}
+            onLogin={(data, password, save) => {
+              return handleLogin(data, password, save)
             }}
           />
         )}

@@ -1,24 +1,25 @@
 import { motion } from 'motion/react'
 import { Lock, User, Wifi, Eye, EyeOff } from 'lucide-react'
-import { SecureStorage } from '../lib/storage'
 import { useForm } from 'react-hook-form'
-import { useMutation } from '@tanstack/react-query'
 import { login } from '../api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 interface LoginProps {
-  onLogin: (data: Awaited<ReturnType<typeof login>>, saveData: boolean) => unknown
+  error?: Error | null
+  onLogin: (data: Awaited<ReturnType<typeof login>>, password: string, saveData: boolean) => unknown
 }
-//"https://accounts.google.com/o/oauth2/v2/auth?include_granted_scopes=true&response_type=code&access_type=offline&state=state_parameter_passthrough_value&redirect_uri=https://my.te.eg/echannel/socialaccount/770/6030101231007160302&client_id=567276881801-atpuiavaieass7nk2bh80n0a5j83053a.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/userinfo.profile"
 
 interface FieldValues {
   number: string
   password: string
   saveCredentials: boolean
 }
-export default function Login({ onLogin }: LoginProps) {
+export default function Login({ onLogin, error }: LoginProps) {
   const { register, handleSubmit, formState, setError } = useForm<FieldValues>()
-  const isLoading = formState.isSubmitting || formState.isLoading
+  const isLoading = formState.isSubmitting
   const [showPassword, setShowPassword] = useState(false)
+  useEffect(() => {
+    if (error) setError('root', { message: error?.message })
+  }, [error])
   return (
     <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white min-h-screen">
       <motion.div
@@ -36,9 +37,11 @@ export default function Login({ onLogin }: LoginProps) {
           <p className="text-xs sm:text-sm text-slate-500 mt-2">
             Manage your connection and startup preferences.
           </p>
-          <p className="text-red-500 text-center text-xs sm:text-sm">
-            {formState.errors.root?.message}
-          </p>
+          {formState.errors.root && (
+            <p className="text-red-500 text-center text-xs sm:text-sm">
+              {formState.errors.root?.message}
+            </p>
+          )}
         </div>
 
         <form
@@ -48,9 +51,7 @@ export default function Login({ onLogin }: LoginProps) {
                 number: data.number.slice(1),
                 password: data.password
               })
-              if (data.saveCredentials)
-                await SecureStorage.saveCredentials(data.number, data.password)
-              await onLogin(result, data.saveCredentials)
+              await onLogin(result, data.password, data.saveCredentials)
             } catch (error) {
               if (error instanceof Error) setError('root', { message: error.message })
             }

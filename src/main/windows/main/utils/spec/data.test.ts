@@ -16,7 +16,6 @@ let loginInfo: {
 }
 beforeAll(async () => {
   const res = await login({ password: process.env.password!, number: process.env.number! })
-  console.log(res.header)
   expect(res.header.retCode).toEqual('0')
   expect(loginInfo).toHaveProperty('body')
   if (hasProperty(res, 'body'))

@@ -31,6 +31,9 @@ export const HandleMethods: HandelMethodsType = {
   solveCaptcha: async function (_, image: string, token, number: string) {
     const win = await createCaptchaWindow({}, { captcha: image, token, number })
     return await new Promise((res) => {
+      win.on('close', () => {
+        res(null)
+      })
       win.on('captcha', (code) => {
         res(code)
       })
