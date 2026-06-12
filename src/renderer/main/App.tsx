@@ -87,16 +87,5 @@ export default function App() {
 }
 
 function _LoginContainer({ onLogin }: { onLogin: (u: string) => void }) {
-  return (
-    <div className="w-105 shadow-2xl rounded-lg overflow-hidden border border-slate-200 bg-white">
-      <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-slate-200">
-        <span className="text-[12px] font-semibold text-slate-500">Quota Manager v1.2.0</span>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
-        </div>
-      </div>
-      <Login onLogin={(data) => onLogin(data.body.customer.custName)} />
-    </div>
-  )
+  return <Login onLogin={(data) => onLogin(data.body.customer.custName)} />
 }

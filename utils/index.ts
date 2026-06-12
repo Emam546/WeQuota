@@ -7,6 +7,12 @@ export function ObjectEntries<T extends object | Array<unknown>>(
     [K in keyof T]: [K, T[K]]
   }[keyof T][]
 }
+export function hasProperty<K extends PropertyKey>(
+  obj: unknown,
+  key: K
+): obj is Record<K, unknown> {
+  return typeof obj === 'object' && obj !== null && key in obj
+}
 export function objectKeys<T extends object>(val: T): Array<keyof T> {
   return Object.keys(val) as Array<keyof T>
 }

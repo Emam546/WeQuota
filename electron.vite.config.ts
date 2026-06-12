@@ -6,8 +6,8 @@ export default defineConfig({
   main: {
     resolve: {
       alias: {
-        '@utils': resolve('./utils'),
-        '@renderer': resolve('./src/renderer/')
+        '@main': resolve('./src/main'),
+        '@utils': resolve('./utils')
       }
     }
   },
@@ -17,8 +17,9 @@ export default defineConfig({
       outDir: './out/windows/',
       rollupOptions: {
         input: {
-          login: resolve(__dirname, 'src/renderer/login/index.html'),
-          frame: resolve(__dirname, 'src/renderer/frame/index.html')
+          main: resolve(__dirname, 'src/renderer/main/index.html'),
+          frame: resolve(__dirname, 'src/renderer/frame/index.html'),
+          captcha: resolve(__dirname, 'src/renderer/captcha/index.html')
         }
       }
     },

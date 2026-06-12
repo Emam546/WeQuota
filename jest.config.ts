@@ -18,7 +18,8 @@ const config: Config = {
   moduleNameMapper: {
     ...pathsToModuleNameMapper(
       {
-        '@renderer/*': ['src/renderer/*']
+        '@renderer/*': ['src/renderer/*'],
+        '@utils/*': ['./utils']
       },
       {
         prefix: '<rootDir>/'

@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { login as __login, ApiResponse, EnterData } from '..'
+import { login as __login, ApiResponse, EnterData } from '../login'
 import readline from 'readline'
 import path from 'path'
 import { exec } from 'child_process'
@@ -26,12 +26,16 @@ export async function askCaptcha(base64Image: string): Promise<string> {
   })
 }
 async function login(data: EnterData): Promise<ApiResponse> {
-  let imgCode = ''
+  let infoToken = {}
   while (true) {
-    const data1 = await __login({ ...data, imgCode })
+    const data1 = await __login({ ...data, ...infoToken })
     if (data1.status == 'Blocked') throw new Error('you have been blocked')
     if (data1.requireInteraction) {
-      imgCode = await askCaptcha(data1.captcha)
+      const imgCode = await askCaptcha(data1.captcha)
+      infoToken = {
+        imgCode,
+        token: data1.token
+      }
     } else return data1.data
   }
 }

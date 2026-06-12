@@ -1,4 +1,4 @@
-*.json
+result.json
 node_modules
 dist
 out

@@ -12,7 +12,7 @@ export default function Login({ onLogin }: LoginProps) {
   const mutate = useMutation({ mutationFn: login })
   const isLoading = mutate.isPending || formState.isLoading
   return (
-    <div className="flex items-center justify-center p-8 bg-white min-h-[480px]">
+    <div className="flex items-center justify-center p-8 bg-white min-h-120">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

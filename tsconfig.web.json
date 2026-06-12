@@ -7,12 +7,13 @@
     "src/shared/*.d.ts",
     "src/preload/*.d.ts",
     "utils/**/*.ts",
+   "src",
   
   ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "paths": {
       "@renderer/*": [
         "./src/renderer/*"

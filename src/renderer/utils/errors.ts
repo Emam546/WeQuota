@@ -7,13 +7,13 @@ export class WeError extends Error {
   }
 }
 export const invalidLoginData = new WeError('603010110400001', 'invalid user data')
-export const EmptyLoginData = new WeError('603010110400001', 'empty user data')
-const errors = [invalidLoginData, EmptyLoginData]
-export function throwError(codeNum: string) {
+export const IncorrectCaptcha = new WeError('60301025072100001', 'incorrect captcha')
+const errors = [invalidLoginData, IncorrectCaptcha]
+export function throwError(codeNum: string, message?: string) {
   for (let i = 0; i < errors.length; i++) {
     const element = errors[i]
-    if (element.codeNum == codeNum) throw element
+    if (element.codeNum == codeNum) return element
   }
 
-  throw new WeError(codeNum, 'unknownError')
+  return new WeError(codeNum, message ?? 'unknownError')
 }
