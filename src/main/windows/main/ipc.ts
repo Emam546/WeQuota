@@ -4,6 +4,14 @@ import { ObjectEntries } from '@utils/index'
 import { ipcMain } from 'electron'
 import { login } from './utils/login'
 import { createWindow as createCaptchaWindow } from '../captcha'
+import {
+  getBalanceData,
+  getBillingData,
+  getInfoData,
+  getQuotaData,
+  getSubscriberData
+} from './utils/data'
+
 type OnMethodsType = {
   [K in keyof ApiMain.OnMethods]: ConvertToIpCMainFunc<ApiMain.OnMethods[K]>
 }
@@ -27,6 +35,21 @@ export const HandleMethods: HandelMethodsType = {
         res(code)
       })
     })
+  },
+  getBalanceData: function (_, ...args) {
+    return getBalanceData(...args)
+  },
+  getBillingData: function (_, ...args) {
+    return getBillingData(...args)
+  },
+  getInfoData: function (_, ...args) {
+    return getInfoData(...args)
+  },
+  getQuotaData: function (_, ...args) {
+    return getQuotaData(...args)
+  },
+  getSubscriberData: function (_, ...args) {
+    return getSubscriberData(...args)
   }
 }
 export const HandleOnceMethods: HandelOnceMethodsType = {}

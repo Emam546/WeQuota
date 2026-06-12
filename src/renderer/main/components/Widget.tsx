@@ -6,10 +6,10 @@ import { SecureStorage } from '../lib/storage'
 
 interface WidgetProps {
   onLogout: () => void
-  username: string
+  token: string
 }
 
-export default function Widget({ onLogout, username }: WidgetProps) {
+export default function Widget({ onLogout, token }: WidgetProps) {
   const [used, setUsed] = useState(25.9)
   const [total, setTotal] = useState(35.0)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -31,16 +31,7 @@ export default function Widget({ onLogout, username }: WidgetProps) {
   }
 
   return (
-    <div className="w-[300px] bg-white rounded-lg shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-200 font-sans">
-      {/* Mini Title Bar */}
-      <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-slate-200">
-        <span className="text-[12px] font-semibold text-slate-500">Quota Mini</span>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-slate-200"></div>
-          <div className="w-3 h-3 rounded-full bg-slate-200"></div>
-        </div>
-      </div>
-
+    <div className="w-full bg-white rounded-lg shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-200 font-sans">
       <div className="p-8 flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -92,7 +83,7 @@ export default function Widget({ onLogout, username }: WidgetProps) {
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight truncate max-w-[120px]">
-            {username}
+            {''}
           </span>
         </div>
         <button

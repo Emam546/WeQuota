@@ -1,4 +1,11 @@
 import { login } from '@main/windows/main/utils/login'
+import {
+  getBalanceData,
+  getBillingData,
+  getInfoData,
+  getQuotaData,
+  getSubscriberData
+} from '@main/windows/main/utils/data'
 
 export type Context = unknown
 export namespace ApiRender {
@@ -10,6 +17,11 @@ export namespace Api {
   interface OnceMethods {}
   interface HandleMethods {
     login: typeof login
+    getBalanceData: typeof getBalanceData
+    getBillingData: typeof getBillingData
+    getInfoData: typeof getInfoData
+    getQuotaData: typeof getQuotaData
+    getSubscriberData: typeof getSubscriberData
     solveCaptcha(
       image: string,
       token: string,

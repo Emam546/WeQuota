@@ -1,52 +1,65 @@
 import { motion } from 'motion/react'
-import { Lock, User, Wifi } from 'lucide-react'
+import { Lock, User, Wifi, Eye, EyeOff } from 'lucide-react'
 import { SecureStorage } from '../lib/storage'
 import { useForm } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import { login } from '../api'
+import { useState } from 'react'
 interface LoginProps {
-  onLogin: (data: Awaited<ReturnType<typeof login>>) => void
+  onLogin: (data: Awaited<ReturnType<typeof login>>, saveData: boolean) => unknown
+}
+//"https://accounts.google.com/o/oauth2/v2/auth?include_granted_scopes=true&response_type=code&access_type=offline&state=state_parameter_passthrough_value&redirect_uri=https://my.te.eg/echannel/socialaccount/770/6030101231007160302&client_id=567276881801-atpuiavaieass7nk2bh80n0a5j83053a.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/userinfo.profile"
+
+interface FieldValues {
+  number: string
+  password: string
+  saveCredentials: boolean
 }
 export default function Login({ onLogin }: LoginProps) {
-  const { register, handleSubmit, formState, setError } = useForm()
-  const mutate = useMutation({ mutationFn: login })
-  const isLoading = mutate.isPending || formState.isLoading
+  const { register, handleSubmit, formState, setError } = useForm<FieldValues>()
+  const isLoading = formState.isSubmitting || formState.isLoading
+  const [showPassword, setShowPassword] = useState(false)
   return (
-    <div className="flex items-center justify-center p-8 bg-white min-h-120">
+    <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm space-y-8"
+        className="w-full max-w-sm sm:max-w-md lg:max-w-lg space-y-6 sm:space-y-8"
       >
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 mb-6 shadow-sm border border-blue-100">
-            <Wifi size={32} />
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-blue-50 text-blue-600 mb-4 sm:mb-6 shadow-sm border border-blue-100">
+            <Wifi size={24} />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">NetQuota Login</h1>
-          <p className="text-sm text-slate-500 mt-2">
+          <h1 className="text-xl sm:text-2xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+            NetQuota Login
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-2">
             Manage your connection and startup preferences.
           </p>
-          <p className="text-red-500 text-center">{formState.errors.root?.message}</p>
+          <p className="text-red-500 text-center text-xs sm:text-sm">
+            {formState.errors.root?.message}
+          </p>
         </div>
 
         <form
           onSubmit={handleSubmit(async (data) => {
             try {
-              const result = await mutate.mutateAsync({
+              const result = await login({
                 number: data.number.slice(1),
                 password: data.password
               })
-              await SecureStorage.saveCredentials(data.number, data.password)
-              onLogin(result)
+              if (data.saveCredentials)
+                await SecureStorage.saveCredentials(data.number, data.password)
+              await onLogin(result, data.saveCredentials)
             } catch (error) {
               if (error instanceof Error) setError('root', { message: error.message })
             }
           })}
-          className="mt-8 space-y-5"
+          className="mt-6 sm:mt-8 space-y-4 sm:space-y-5"
         >
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
-              <label className="text-[13px] font-bold text-slate-700 ml-1">
+              <label className="text-[11px] sm:text-[13px] font-bold text-slate-700 ml-1">
                 Service Provider Username
               </label>
               <div className="relative">
@@ -56,13 +69,13 @@ export default function Login({ onLogin }: LoginProps) {
                 <input
                   type="text"
                   {...register('number', { required: true })}
-                  className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 sm:text-sm transition-all shadow-sm"
-                  placeholder="john.doe_fiber_home"
+                  className="block w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 text-xs sm:text-sm transition-all shadow-sm"
+                  placeholder="0473862111"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[13px] font-bold text-slate-700 ml-1">
+              <label className="text-[11px] sm:text-[13px] font-bold text-slate-700 ml-1">
                 Access Token / Password
               </label>
               <div className="relative">
@@ -70,27 +83,34 @@ export default function Login({ onLogin }: LoginProps) {
                   <Lock size={18} />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   {...register('password', { required: true })}
-                  className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 sm:text-sm transition-all shadow-sm"
+                  className="block w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 text-xs sm:text-sm transition-all shadow-sm"
                   placeholder="••••••••••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2 sm:space-y-3 pt-2">
             <div className="flex items-center">
               <input
                 id="startup"
                 name="startup"
                 type="checkbox"
                 defaultChecked
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
               />
               <label
                 htmlFor="startup"
-                className="ml-3 block text-[13px] text-slate-500 font-medium"
+                className="ml-2 sm:ml-3 block text-[11px] sm:text-[13px] text-slate-500 font-medium"
               >
                 Launch automatically with Windows
               </label>
@@ -99,13 +119,13 @@ export default function Login({ onLogin }: LoginProps) {
               <input
                 id="remember-me"
                 type="checkbox"
-                {...register('remember-me')}
+                {...register('saveCredentials')}
                 defaultChecked
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
               />
               <label
                 htmlFor="remember-me"
-                className="ml-3 block text-[13px] text-slate-500 font-medium"
+                className="ml-2 sm:ml-3 block text-[11px] sm:text-[13px] text-slate-500 font-medium"
               >
                 Save credentials and auto-login
               </label>
@@ -115,10 +135,10 @@ export default function Login({ onLogin }: LoginProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md shadow-blue-200 transition-all disabled:opacity-50 mt-4"
+            className="group relative w-full flex justify-center py-3 sm:py-3.5 px-4 border border-transparent text-xs sm:text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md shadow-blue-200 transition-all disabled:opacity-50 mt-3 sm:mt-4"
           >
             {isLoading ? (
-              <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
                   cx="12"

@@ -5,51 +5,73 @@
 
 import { useState, useEffect } from 'react'
 import Login from './components/Login'
-import Widget from './components/Widget'
+import Dashboard from './components/Dashboard'
 import { SecureStorage } from './lib/storage'
 import { useMutation } from '@tanstack/react-query'
+import { login, getData, LoginData } from './api'
+import { demoData } from './data/demoData'
+import { BodyData as LoginBodyData } from '@main/windows/main/utils/login'
+import { DemoData } from './types'
+interface SavedData extends LoginData {
+  password: string
+}
 
+type SessionType = { isLoggedIn: true; data: DemoData } | { isLoggedIn: false }
 export default function App() {
-  const [session, setSession] = useState<{ isLoggedIn: boolean; username: string | null }>({
-    isLoggedIn: false,
-    username: null
+  const [session, setSession] = useState<SessionType>({
+    isLoggedIn: false
   })
-  const mutateSession = useMutation({
-    mutationFn: async () => {
-      const saved = await SecureStorage.getSavedCredentials()
-      return saved
+  const getDashBoardData = useMutation({
+    mutationFn: (data: LoginData) => {
+      return getData(data)
     }
   })
+  const mutateLogin = useMutation({ mutationFn: login })
+  const handleLogin = async (data: LoginBodyData, save: boolean) => {
+    console.log('YEEEEEEEEEEEEEES')
+    const savedData = await getDashBoardData.mutateAsync({
+      subscriberId: data.subscriber.subscriberId,
+      token: data.uToken,
+      acctId: data.subscriber.accountId,
+      custId: data.subscriber.custId
+    })
+    if (save) SecureStorage.saveCredentials(data.subscriber.servNumber.slice(3), savedData)
+    setSession({ data: savedData, isLoggedIn: true })
+  }
   useEffect(() => {
     // Check for saved session on mount
     const checkSession = async () => {
-      const saved = await mutateSession.mutateAsync()
+      const saved = await SecureStorage.getSavedCredentials<SavedData>()
       if (saved.success) {
-        setSession({
-          isLoggedIn: true,
-          username: saved.username!
-        })
+        getDashBoardData
+          .mutateAsync({ ...saved.data! })
+          .then((data) => {
+            setSession({
+              isLoggedIn: true,
+              data
+            })
+          })
+          .catch(async () => {
+            const data = await mutateLogin.mutateAsync({
+              number: saved.username!,
+              password: saved.data!.password
+            })
+            handleLogin(data, true)
+          })
       }
     }
 
     checkSession()
   }, [])
 
-  const handleLogin = (username: string) => {
+  const handleLogout = async () => {
+    await SecureStorage.clearSession()
     setSession({
-      isLoggedIn: true,
-      username: username
+      isLoggedIn: false
     })
   }
 
-  const handleLogout = () => {
-    setSession({
-      isLoggedIn: false,
-      username: null
-    })
-  }
-
-  if (mutateSession.isPending) {
+  if (getDashBoardData.isPending) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
@@ -61,24 +83,26 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] relative overflow-hidden flex items-center justify-center font-sans tracking-tight">
+    <div className="h-screen w-screen bg-[#F1F5F9] relative overflow-hidden font-sans tracking-tight flex flex-col">
       {/* Background decoration to match the new blue theme */}
       <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[100px] opacity-20"></div>
       <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-slate-200 rounded-full blur-[100px] opacity-20"></div>
 
-      <div className="relative z-10 transition-all duration-500 ease-in-out">
+      <div className="relative z-10 flex-1 overflow-hidden flex flex-col">
         {session.isLoggedIn ? (
-          <div className="flex gap-10 items-start">
-            <Widget onLogout={handleLogout} username={session.username || 'User'} />
-          </div>
+          <Dashboard onLogout={handleLogout} demoData={demoData} />
         ) : (
-          <_LoginContainer onLogin={handleLogin} />
+          <Login
+            onLogin={(data, save) => {
+              return handleLogin(data, save)
+            }}
+          />
         )}
       </div>
 
       {/* Footer Info */}
-      <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-        <span className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em] opacity-60">
+      <div className="relative z-10 py-2 text-center pointer-events-none flex-shrink-0">
+        <span className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em] opacity-60">
           NetQuota Desktop v1.2.0
         </span>
       </div>
@@ -86,6 +110,6 @@ export default function App() {
   )
 }
 
-function _LoginContainer({ onLogin }: { onLogin: (u: string) => void }) {
-  return <Login onLogin={(data) => onLogin(data.body.customer.custName)} />
-}
+// function _LoginContainer({ onLogin }: { onLogin: (u: string) => void }) {
+//   return
+// }

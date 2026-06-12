@@ -18,19 +18,19 @@ const STORAGE_KEYS = {
 
 export const SecureStorage = {
   /** Stores credentials securely */
-  async saveCredentials(username: string, password?: string) {
+  async saveCredentials(username: string, data?: unknown) {
     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, username)
     localStorage.setItem(STORAGE_KEYS.AUTO_LOGIN, 'true')
 
-    if (password) {
+    if (data) {
       // Simulation of Windows Credential Manager storage
       console.log(`[SECURE] Storing credentials for ${username} in Credential Manager...`)
-      localStorage.setItem(`${SERVICE_NAME}_${username}_secret`, btoa(password))
+      localStorage.setItem(`${SERVICE_NAME}_${username}_secret`, btoa(JSON.stringify(data)))
     }
   },
 
   /** Retrieves credentials for auto-login */
-  async getSavedCredentials() {
+  async getSavedCredentials<T>() {
     const isAutoLoginEnabled = localStorage.getItem(STORAGE_KEYS.AUTO_LOGIN) === 'true'
     const username = localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
 
@@ -39,7 +39,7 @@ export const SecureStorage = {
       return {
         success: true,
         username,
-        password: secret ? atob(secret) : null
+        data: secret ? (JSON.parse(atob(secret)) as T) : null
       }
     }
 
