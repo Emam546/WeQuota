@@ -32,12 +32,15 @@ export interface BodyData {
 export interface Data {
   subscriberId: `${number}`
 }
-export default async function getSubscriberData(info: Data, token: string) {
+export default async function getSubscriberData(
+  info: Data,
+  tokens: { token: string; utoken: string }
+) {
   const data = await makePostRequest<BodyData, Data>(
     'https://my.te.eg/echannel/service/besapp/base/rest/busiservice/cz/v1/customer/querySubscribers',
     {
-      token: token,
-      body: info
+      body: info,
+      ...tokens
     }
   )
 

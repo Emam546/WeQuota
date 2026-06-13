@@ -39,16 +39,19 @@ export interface BodyData {
 export interface Data {
   custId: string
 }
-export default async function getUserInfoData(info: Data, token: string) {
+export default async function getUserInfoData(
+  info: Data,
+  tokens: { token: string; utoken: string }
+) {
   const data = await makePostRequest<BodyData>(
     'https://my.te.eg/echannel/service/besapp/base/rest/busiservice/v1/customer/getCustomerDetailInfo',
     {
-      token,
       body: {
         custId: info.custId,
         includeAddrFlag: 'Y',
         includeContactPersonFlag: 'Y'
-      }
+      },
+      ...tokens
     }
   )
 

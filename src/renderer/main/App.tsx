@@ -29,18 +29,19 @@ export default function App() {
   const currentLoading = useRef(false)
   const mutateLogin = useMutation({ mutationFn: login })
   const handleLogin = async (data: LoginBodyData, password: string, save: boolean) => {
-    console.log('login success')
     if (save)
       SecureStorage.saveCredentials(data.subscriber.servNumber.slice(3), {
         subscriberId: data.subscriber.subscriberId,
-        token: data.uToken,
+        utoken: data.uToken,
         acctId: data.subscriber.accountId,
         custId: data.subscriber.custId,
-        password: password
+        password: password,
+        token: data.token
       } as SavedData)
     const savedData = await getDashBoardData.mutateAsync({
       subscriberId: data.subscriber.subscriberId,
-      token: data.uToken,
+      utoken: data.uToken,
+      token: data.token,
       acctId: data.subscriber.accountId,
       custId: data.subscriber.custId
     })
@@ -104,7 +105,7 @@ export default function App() {
       <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-slate-200 rounded-full blur-[100px] opacity-20"></div>
       <div className="relative z-10 flex-1 overflow-hidden flex flex-col">
         {session.isLoggedIn ? (
-          <Dashboard onLogout={handleLogout} demoData={demoData} />
+          <Dashboard onLogout={handleLogout} demoData={session.data} />
         ) : (
           <Login
             error={mutateLogin.error || getDashBoardData.error}

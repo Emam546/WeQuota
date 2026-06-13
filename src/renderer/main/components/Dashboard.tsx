@@ -36,7 +36,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
   }
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row gap-4 lg:gap-6">
+    <div className="w-full h-full flex flex-col lg:flex-row gap-4 lg:gap-6 ">
       {/* Desktop Sidebar - Hidden on mobile/tablet */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -218,7 +218,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+      <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-3">
         <AnimatePresence mode="wait">
           {currentPage === 'usage' && (
             <motion.div

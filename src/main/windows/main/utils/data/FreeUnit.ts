@@ -83,16 +83,16 @@ export interface Data {
   mainOfferId: string
   subscriberId: string
 }
-export default async function getQuotaData(info: Data, token: string) {
+export default async function getQuotaData(info: Data, tokens: { token: string; utoken: string }) {
   const data = await makePostRequest<BodyData>(
     'https://my.te.eg/echannel/service/besapp/base/rest/busiservice/cz/cbs/bb/queryFreeUnit',
     {
-      token: token,
       body: {
         ...info,
         groupId: '',
         needQueryPoint: true
-      }
+      },
+      ...tokens
     }
   )
 

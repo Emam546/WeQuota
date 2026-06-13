@@ -64,6 +64,7 @@ export async function login(data: Parameters<ApiMain.HandleMethods['login']>[0])
   }
 }
 export interface LoginData {
+  utoken: string
   token: string
   acctId: `${number}`
   custId: `${number}`
@@ -71,19 +72,16 @@ export interface LoginData {
 }
 export async function getData({
   token,
+  custId,
   subscriberId,
-  acctId: acctId
-}: {
-  token: string
-  subscriberId: `${number}`
-  acctId: `${number}`
-  custId: `${number}`
-}): Promise<DemoData> {
+  acctId: acctId,
+  utoken
+}: LoginData): Promise<DemoData> {
   const funcs: Record<keyof DemoData, Promise<ApiResponse<unknown>>> = {
-    usage: window.api.invoke('getBillingData', { subscriberId }, token),
-    quota: window.api.invoke('getQuotaData', { subscriberId, mainOfferId: '' }, token),
-    balance: window.api.invoke('getBalanceData', { acctId }, token),
-    customer: window.api.invoke('getInfoData', { custId: acctId }, token)
+    usage: window.api.invoke('getBillingData', { subscriberId }, { token, utoken }),
+    quota: window.api.invoke('getQuotaData', { subscriberId, mainOfferId: '' }, { token, utoken }),
+    balance: window.api.invoke('getBalanceData', { acctId }, { token, utoken }),
+    customer: window.api.invoke('getInfoData', { custId }, { token, utoken })
   }
   const objEntries = ObjectEntries(funcs)
   const acc = {}

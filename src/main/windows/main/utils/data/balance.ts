@@ -34,12 +34,15 @@ export interface BodyData {
 export interface Data {
   acctId: `${number}`
 }
-export default async function getBalanceData(info: Data, token: string) {
+export default async function getBalanceData(
+  info: Data,
+  tokens: { token: string; utoken: string }
+) {
   const data = await makePostRequest<BodyData, Data>(
     'https://my.te.eg/echannel/service/besapp/base/rest/busiservice/cbs/ar/queryBalance',
     {
-      token: token,
-      body: info
+      body: info,
+      ...tokens
     }
   )
 

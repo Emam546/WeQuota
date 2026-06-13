@@ -17,17 +17,18 @@ let loginInfo: {
 beforeAll(async () => {
   const res = await login({ password: process.env.password!, number: process.env.number! })
   expect(res.header.retCode).toEqual('0')
-  expect(loginInfo).toHaveProperty('body')
+  expect(res).toHaveProperty('body')
   if (hasProperty(res, 'body'))
     loginInfo = {
       ...res.body.subscriber,
-      acctId: res.body.subscriber.accountId,
+      acctId: res.body.subscriber.custId,
       token: res.body.utoken
     }
 })
 describe('get Data system', () => {
   test('get billingInfo', async () => {
     const res = await getBalanceData(loginInfo, loginInfo.token)
+    console.log(res)
     expect(res.header.retCode).toEqual('0')
     console.log(res)
   })
