@@ -1,3 +1,5 @@
+/* eslint-disable prefer-spread */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router } from 'express'
 import {
   getBalanceData,
@@ -12,13 +14,8 @@ const router = Router()
 // Get quota data
 router.post('/quota', async (req, res) => {
   try {
-    const { mainOfferId, subscriberId, token } = req.body
-
-    if (!mainOfferId || !subscriberId || !token) {
-      return res.status(400).json({ error: 'mainOfferId, subscriberId, and token are required' })
-    }
-
-    const data = await getQuotaData({ mainOfferId, subscriberId }, token)
+    const args = Array.from(Object.values(req.body)) as any
+    const data = await getQuotaData.apply(null, args)
     res.json(data)
   } catch (error) {
     console.error('Quota data error:', error)
@@ -29,13 +26,8 @@ router.post('/quota', async (req, res) => {
 // Get balance data
 router.post('/balance', async (req, res) => {
   try {
-    const { acctId, token } = req.body
-
-    if (!acctId || !token) {
-      return res.status(400).json({ error: 'acctId and token are required' })
-    }
-
-    const data = await getBalanceData({ acctId }, token)
+    const args = Array.from(Object.values(req.body)) as any
+    const data = await getBalanceData.apply(null, args)
     res.json(data)
   } catch (error) {
     console.error('Balance data error:', error)
@@ -46,13 +38,9 @@ router.post('/balance', async (req, res) => {
 // Get billing usage data
 router.post('/billing-usage', async (req, res) => {
   try {
-    const { subscriberId, token } = req.body
+    const args = Array.from(Object.values(req.body)) as any
+    const data = await getBillingData.apply(null, args)
 
-    if (!subscriberId || !token) {
-      return res.status(400).json({ error: 'subscriberId and token are required' })
-    }
-
-    const data = await getBillingData({ subscriberId }, token)
     res.json(data)
   } catch (error) {
     console.error('Billing usage error:', error)
@@ -63,13 +51,9 @@ router.post('/billing-usage', async (req, res) => {
 // Get user info data
 router.post('/info', async (req, res) => {
   try {
-    const { custId, token } = req.body
+    const args = Array.from(Object.values(req.body)) as any
+    const data = await getInfoData.apply(null, args)
 
-    if (!custId || !token) {
-      return res.status(400).json({ error: 'custId and token are required' })
-    }
-
-    const data = await getInfoData({ custId }, token)
     res.json(data)
   } catch (error) {
     console.error('User info error:', error)
@@ -80,13 +64,9 @@ router.post('/info', async (req, res) => {
 // Get subscriber data
 router.post('/subscriber', async (req, res) => {
   try {
-    const { subscriberId, token } = req.body
+    const args = Array.from(Object.values(req.body)) as any
+    const data = await getSubscriberData.apply(null, args)
 
-    if (!subscriberId || !token) {
-      return res.status(400).json({ error: 'subscriberId and token are required' })
-    }
-
-    const data = await getSubscriberData({ subscriberId }, token)
     res.json(data)
   } catch (error) {
     console.error('Subscriber data error:', error)

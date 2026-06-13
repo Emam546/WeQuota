@@ -10,29 +10,35 @@ const FunctionData: Api.HandleMethods = {
     return (await axios.post('/api/login', { ...data })).data
   },
   getBalanceData: async (...data) => {
-    return (await axios.post('/api/login', { ...data })).data
+    return (await axios.post('/api/data/balance', { ...data })).data
   },
   getBillingData: async (...data) => {
-    return (await axios.post('/api/login', { ...data })).data
+    return (await axios.post('/api/data/billing-usage', { ...data })).data
   },
   getInfoData: async (...data) => {
-    return (await axios.post('/api/login', { ...data })).data
+    return (await axios.post('/api/data/info', { ...data })).data
   },
   getQuotaData: async (...data) => {
-    return (await axios.post('/api/login', { ...data })).data
+    return (await axios.post('/api/data/quota', { ...data })).data
   },
   getSubscriberData: async (...data) => {
-    return (await axios.post('/api/login', { ...data })).data
+    return (await axios.post('/api/data/subscriber', { ...data })).data
   },
+
   solveCaptcha: function (
     image: string,
     token: string,
     number: string
   ): Promise<{ token: string; imgCode: string } | null> {
-    throw new Error('Function not implemented.')
+    return new Promise((resolve) => {
+      const event = new CustomEvent('show-captcha', {
+        detail: { image, token, number, resolve }
+      })
+      window.dispatchEvent(event)
+    })
   }
 }
-function getFunctionInvoke<K extends keyof Api.HandleMethods>(
+export function getFunctionInvoke<K extends keyof Api.HandleMethods>(
   key: K,
   ...params: Api.HandleMethods[K] extends (...args: infer P) => any ? P : never
 ): ReturnType<Api.HandleMethods[K]> {
@@ -78,16 +84,15 @@ export async function getData({
   utoken
 }: LoginData): Promise<DemoData> {
   const funcs: Record<keyof DemoData, Promise<ApiResponse<unknown>>> = {
-    usage: window.api.invoke('getBillingData', { subscriberId }, { token, utoken }),
-    quota: window.api.invoke('getQuotaData', { subscriberId, mainOfferId: '' }, { token, utoken }),
-    balance: window.api.invoke('getBalanceData', { acctId }, { token, utoken }),
-    customer: window.api.invoke('getInfoData', { custId }, { token, utoken })
+    usage: getFunctionInvoke('getBillingData', { subscriberId }, { token, utoken }),
+    quota: getFunctionInvoke('getQuotaData', { subscriberId, mainOfferId: '' }, { token, utoken }),
+    balance: getFunctionInvoke('getBalanceData', { acctId }, { token, utoken }),
+    customer: getFunctionInvoke('getInfoData', { custId }, { token, utoken })
   }
   const objEntries = ObjectEntries(funcs)
   const acc = {}
   for (let i = 0; i < objEntries.length; i++) {
     const result = await objEntries[i][1]
-    console.log(result)
     if (hasProperty(result, 'body')) acc[objEntries[i][0]] = result
     else throw throwError(result.header.errorNo, result.header.errorMsg)
   }

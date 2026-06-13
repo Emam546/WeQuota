@@ -37,6 +37,7 @@ export default function App() {
     retry: 0,
     enabled: credentials != null,
     retryOnMount: false,
+    refetchOnWindowFocus: false,
     staleTime: 10 * 60 * 1000
   })
   useEffect(() => {

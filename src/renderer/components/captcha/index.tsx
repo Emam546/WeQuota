@@ -1,0 +1,140 @@
+import { RefreshCw, Shield } from 'lucide-react'
+import { useState } from 'react'
+import style from './style.module.scss'
+import classNames from 'classnames'
+import { useForm } from 'react-hook-form'
+export interface DataForm {
+  code: string
+  token: string
+}
+export interface Properties {
+  className?: string
+  values: DataForm
+  captcha: string
+  refresh: () => Promise<{ token: string; captcha: string }>
+  send(data: { token: string; code: string }): unknown
+  cancel(): void
+}
+export default function Captcha({
+  className,
+  values,
+  captcha,
+  refresh,
+  send,
+  cancel: cancel
+}: Properties) {
+  const { register, setValue, handleSubmit, formState, setError } = useForm<DataForm>({
+    values: values
+  })
+
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [captchaImage, setCaptchaImage] = useState(captcha)
+
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    refresh()
+      .then((data) => {
+        setValue('token', data.token)
+        setValue('code', '')
+        setCaptchaImage(data.captcha)
+      })
+      .catch((err) => setError('root', err))
+      .finally(() => setIsRefreshing(false))
+  }
+
+  return (
+    <div>
+      <form
+        onSubmit={handleSubmit(async (data) => {
+          await send(data)
+        })}
+        className={classNames('bg-white  shadow-2xl w-full overflow-hidden', className)}
+      >
+        {/* Header */}
+        <div
+          className={classNames(
+            style['frame-drag'],
+            'bg-linear-to-r from-blue-600 to-blue-700 px-6 py-5'
+          )}
+        >
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-10 h-10 text-white rounded-xl bg-white/20">
+              <Shield size={20} />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-white">Verification</h2>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-6 space-y-6">
+          <p className="text-sm text-slate-600">
+            Please enter the code below to verify you are human.
+          </p>
+          {formState.errors.root && <p className="text-red-500">{formState.errors.root.message}</p>}
+          {formState.errors.form && <p className="text-red-500">{formState.errors.form.message}</p>}
+          {/* Captcha Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-[13px] font-bold text-slate-700">Security Code</label>
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                type="reset"
+                className="flex items-center space-x-1.5 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-0 transition-opacity rounded-lg bg-linear-to-r from-blue-500 to-purple-500 blur opacity-20 group-hover:opacity-30" />
+              <div className="relative flex items-center justify-center p-4 border-2 rounded-lg bg-slate-50 border-slate-200 min-h-20">
+                <img src={captchaImage} alt="CAPTCHA" className="object-contain h-16 select-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* Input Field */}
+          <div className="space-y-2">
+            <label className="text-[13px] font-bold text-slate-700 ml-1">
+              Enter Code <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              {...register('code', { required: true })}
+              placeholder="Enter the code shown above"
+              className="block w-full px-4 py-3 leading-5 transition-all border rounded-lg shadow-sm border-slate-200 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 sm:text-sm"
+              maxLength={6}
+            />
+            {formState.errors.code && (
+              <p className="text-red-500">{formState.errors.code.message}</p>
+            )}
+
+            <input type="hidden" {...register('token')} />
+          </div>
+        </div>
+
+        {/* Footer Buttons */}
+        <div className="flex items-center justify-end px-6 py-4 space-x-3 border-t bg-slate-50 border-slate-100">
+          <button
+            type="button"
+            onClick={() => {
+              cancel()
+            }}
+            className="px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={formState.isSubmitting}
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md shadow-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            OK
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}

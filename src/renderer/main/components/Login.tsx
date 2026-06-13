@@ -3,6 +3,8 @@ import { Lock, User, Wifi, Eye, EyeOff } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { login } from '../api'
 import { useEffect, useState } from 'react'
+import CaptchaModal from './CaptchaModal'
+import axios from 'axios'
 interface LoginProps {
   error?: Error | null
   onLogin: (data: Awaited<ReturnType<typeof login>>, password: string, saveData: boolean) => unknown
@@ -17,28 +19,59 @@ export default function Login({ onLogin, error }: LoginProps) {
   const { register, handleSubmit, formState, setError } = useForm<FieldValues>()
   const isLoading = formState.isSubmitting
   const [showPassword, setShowPassword] = useState(false)
+  const [captchaModal, setCaptchaModal] = useState<{
+    isOpen: boolean
+    captchaImage: string
+    token: string
+    number: string
+    resolve: (result: { token: string; imgCode: string } | null) => void
+  }>({
+    isOpen: false,
+    captchaImage: '',
+    token: '',
+    number: '',
+    resolve: () => {}
+  })
   useEffect(() => {
     if (error) setError('root', { message: error?.message })
   }, [error])
+
+  useEffect(() => {
+    const handleCaptcha = (event: CustomEvent) => {
+      const { image, token, number, resolve } = event.detail
+      setCaptchaModal({
+        isOpen: true,
+        captchaImage: image,
+        token,
+        number,
+        resolve
+      })
+    }
+
+    window.addEventListener('show-captcha', handleCaptcha as EventListener)
+    return () => {
+      window.removeEventListener('show-captcha', handleCaptcha as EventListener)
+    }
+  }, [])
   return (
-    <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white min-h-screen">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-white sm:p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm sm:max-w-md lg:max-w-lg space-y-6 sm:space-y-8"
+        className="w-full max-w-sm space-y-6 sm:max-w-md lg:max-w-lg sm:space-y-8"
       >
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-blue-50 text-blue-600 mb-4 sm:mb-6 shadow-sm border border-blue-100">
+          <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-blue-600 border border-blue-100 shadow-sm sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-blue-50 sm:mb-6">
             <Wifi size={24} />
           </div>
-          <h1 className="text-xl sm:text-2xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl lg:text-2xl text-slate-900">
             NetQuota Login
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-2">
+          <p className="mt-2 text-xs sm:text-sm text-slate-500">
             Manage your connection and startup preferences.
           </p>
           {formState.errors.root && (
-            <p className="text-red-500 text-center text-xs sm:text-sm">
+            <p className="text-xs text-center text-red-500 sm:text-sm">
               {formState.errors.root?.message}
             </p>
           )}
@@ -56,7 +89,7 @@ export default function Login({ onLogin, error }: LoginProps) {
               if (error instanceof Error) setError('root', { message: error.message })
             }
           })}
-          className="mt-6 sm:mt-8 space-y-4 sm:space-y-5"
+          className="mt-6 space-y-4 sm:mt-8 sm:space-y-5"
         >
           <div className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
@@ -64,7 +97,7 @@ export default function Login({ onLogin, error }: LoginProps) {
                 Service Provider Username
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
                   <User size={18} />
                 </div>
                 <input
@@ -80,7 +113,7 @@ export default function Login({ onLogin, error }: LoginProps) {
                 Access Token / Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
                   <Lock size={18} />
                 </div>
                 <input
@@ -92,7 +125,7 @@ export default function Login({ onLogin, error }: LoginProps) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 transition-colors text-slate-400 hover:text-slate-600"
                 >
                   {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -100,7 +133,7 @@ export default function Login({ onLogin, error }: LoginProps) {
             </div>
           </div>
 
-          <div className="space-y-2 sm:space-y-3 pt-2">
+          <div className="pt-2 space-y-2 sm:space-y-3">
             <div className="flex items-center">
               <input
                 id="startup"
@@ -139,7 +172,7 @@ export default function Login({ onLogin, error }: LoginProps) {
             className="group relative w-full flex justify-center py-3 sm:py-3.5 px-4 border border-transparent text-xs sm:text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md shadow-blue-200 transition-all disabled:opacity-50 mt-3 sm:mt-4"
           >
             {isLoading ? (
-              <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-white animate-spin sm:h-5 sm:w-5" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -160,6 +193,33 @@ export default function Login({ onLogin, error }: LoginProps) {
           </button>
         </form>
       </motion.div>
+
+      <CaptchaModal
+        isOpen={captchaModal.isOpen}
+        captchaImage={captchaModal.captchaImage}
+        token={captchaModal.token}
+        refresh={async () => {
+          const res = await axios.post('/api/login/captcha', { number: captchaModal.number })
+          const data = res.data
+          if (data.status == 'Success') {
+            if (data.requireInteraction) return data
+            else {
+              captchaModal.resolve({ token: data.token, imgCode: '' })
+              setCaptchaModal((prev) => ({ ...prev, isOpen: false }))
+            }
+          }
+          return { captcha: '', token: '' }
+        }}
+        // number={captchaModal.number}
+        onSubmit={(solution) => {
+          captchaModal.resolve({ token: solution.token, imgCode: solution.code })
+          setCaptchaModal((prev) => ({ ...prev, isOpen: false }))
+        }}
+        onClose={() => {
+          setCaptchaModal((prev) => ({ ...prev, isOpen: false }))
+          captchaModal.resolve(null)
+        }}
+      />
     </div>
   )
 }
