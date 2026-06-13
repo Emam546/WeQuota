@@ -46,6 +46,10 @@ const Frame = React.forwardRef<ComponentRef<'div'>, ComponentProps<'div'>>(
             className="w-3 h-3 rounded-full bg-amber-400"
           ></button>
           <button
+            onClick={() => window.api.send('ToggleWindowMaximizeState')}
+            className="w-3 h-3 rounded-full bg-green-400"
+          ></button>
+          <button
             onClick={() => window.api.send('closeWindow')}
             className="w-3 h-3 rounded-full bg-red-400"
           ></button>

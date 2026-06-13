@@ -1,1 +1,82 @@
 @import "tailwindcss";
+
+/* Modern Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.5);
+  border-radius: 12px;
+  margin: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  border-radius: 12px;
+  border: 3px solid rgba(241, 245, 249, 0.5);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #db2777 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+  transform: scaleY(1.05);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 50%, #be185d 100%);
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(241, 245, 249, 0.5);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8b5cf6 rgba(241, 245, 249, 0.5);
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.5);
+  border-radius: 12px;
+  margin: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  border-radius: 12px;
+  border: 3px solid rgba(241, 245, 249, 0.5);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #db2777 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+  transform: scaleY(1.05);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 50%, #be185d 100%);
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+*::-webkit-scrollbar-corner {
+  background: rgba(241, 245, 249, 0.5);
+}

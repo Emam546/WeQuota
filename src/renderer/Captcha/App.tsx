@@ -49,10 +49,10 @@ export default function App() {
           )}
         >
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/20 text-white">
+            <div className="flex items-center justify-center w-10 h-10 text-white rounded-xl bg-white/20">
               <Shield size={20} />
             </div>
-            <h2 className="text-xl font-bold text-white tracking-tight">Verification</h2>
+            <h2 className="text-xl font-bold tracking-tight text-white">Verification</h2>
           </div>
         </div>
 
@@ -70,6 +70,7 @@ export default function App() {
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
+                type="reset"
                 className="flex items-center space-x-1.5 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
@@ -78,9 +79,9 @@ export default function App() {
             </div>
 
             <div className="relative group">
-              <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition-opacity" />
-              <div className="relative bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-center justify-center min-h-20">
-                <img src={captchaImage} alt="CAPTCHA" className="h-16 object-contain select-none" />
+              <div className="absolute inset-0 transition-opacity rounded-lg bg-linear-to-r from-blue-500 to-purple-500 blur opacity-20 group-hover:opacity-30" />
+              <div className="relative flex items-center justify-center p-4 border-2 rounded-lg bg-slate-50 border-slate-200 min-h-20">
+                <img src={captchaImage} alt="CAPTCHA" className="object-contain h-16 select-none" />
               </div>
             </div>
           </div>
@@ -94,7 +95,7 @@ export default function App() {
               type="text"
               {...register('code', { required: true })}
               placeholder="Enter the code shown above"
-              className="block w-full px-4 py-3 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 sm:text-sm transition-all shadow-sm"
+              className="block w-full px-4 py-3 leading-5 transition-all border rounded-lg shadow-sm border-slate-200 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 sm:text-sm"
               maxLength={6}
             />
             {formState.errors.code && (
@@ -106,7 +107,7 @@ export default function App() {
         </div>
 
         {/* Footer Buttons */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end space-x-3">
+        <div className="flex items-center justify-end px-6 py-4 space-x-3 border-t bg-slate-50 border-slate-100">
           <button
             type="button"
             onClick={() => {

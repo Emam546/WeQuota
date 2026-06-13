@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { User, HardDrive, LogOut, RefreshCw, X } from 'lucide-react'
 import UserInfo from './pages/UserInfo'
@@ -9,22 +9,33 @@ import { DemoData } from '../types'
 interface DashboardProps {
   onLogout: () => void
   demoData: DemoData
+  isRefreshing: boolean
+  refresh: () => void
 }
 
 type Page = 'usage' | 'userInfo'
 
-export default function Dashboard({ onLogout, demoData }: DashboardProps) {
+export default function Dashboard({
+  onLogout,
+  demoData,
+  isRefreshing: __isRefreshing,
+  refresh
+}: DashboardProps) {
   const [currentPage, setCurrentPage] = useState<Page>('usage')
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  const handleRefresh = () => {
-    setIsRefreshing(true)
-    setTimeout(() => {
-      setIsRefreshing(false)
-    }, 1000)
-  }
-
+  const [isRefreshing, setIsRefreshing] = useState(__isRefreshing)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (__isRefreshing) setIsRefreshing(true)
+    else {
+      const t = setTimeout(() => {
+        setIsRefreshing(false)
+      }, 1000)
+      return () => {
+        clearTimeout(t)
+      }
+    }
+  }, [__isRefreshing])
   const handleLogout = async () => {
     await SecureStorage.clearSession()
     onLogout()
@@ -36,12 +47,12 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
   }
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row gap-4 lg:gap-6 ">
+    <div className="flex flex-col w-full h-full gap-4 lg:flex-row lg:gap-6 ">
       {/* Desktop Sidebar - Hidden on mobile/tablet */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="hidden lg:flex flex-col gap-2 w-64 flex-shrink-0"
+        className="flex-col hidden w-64 gap-2 lg:flex shrink-0"
       >
         <div className="bg-white rounded-lg shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border border-slate-200 p-4 flex flex-col gap-2">
           <button
@@ -53,7 +64,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
             }`}
           >
             <HardDrive size={18} />
-            <span className="font-semibold text-sm">Usage & Balance</span>
+            <span className="text-sm font-semibold">Usage & Balance</span>
           </button>
 
           <button
@@ -65,36 +76,36 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
             }`}
           >
             <User size={18} />
-            <span className="font-semibold text-sm">User Info</span>
+            <span className="text-sm font-semibold">User Info</span>
           </button>
 
           <div className="flex-1" />
 
           <button
-            onClick={handleRefresh}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 transition-all"
+            onClick={refresh}
+            className="flex items-center gap-3 px-4 py-3 transition-all rounded-lg text-slate-600 hover:bg-slate-100"
             disabled={isRefreshing}
           >
             <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-            <span className="font-semibold text-sm">Refresh</span>
+            <span className="text-sm font-semibold">Refresh</span>
           </button>
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all"
+            className="flex items-center gap-3 px-4 py-3 text-red-600 transition-all rounded-lg hover:bg-red-50"
           >
             <LogOut size={18} />
-            <span className="font-semibold text-sm">Logout</span>
+            <span className="text-sm font-semibold">Logout</span>
           </button>
         </div>
       </motion.div>
 
       {/* Mobile/Tablet Top Navigation */}
-      <div className="lg:hidden flex flex-col w-full">
+      <div className="flex flex-col w-full lg:hidden">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border border-slate-200 p-2 mb-4 flex items-center justify-between flex-shrink-0"
+          className="bg-white rounded-lg shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border border-slate-200 p-2 mb-4 flex items-center justify-between shrink-0"
         >
           <div className="flex gap-1">
             <button
@@ -106,7 +117,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
               }`}
             >
               <HardDrive size={14} className="sm:size-16" />
-              <span className="font-semibold text-xs hidden sm:inline">Usage</span>
+              <span className="hidden text-xs font-semibold sm:inline">Usage</span>
             </button>
 
             <button
@@ -118,14 +129,14 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
               }`}
             >
               <User size={14} className="sm:size-16" />
-              <span className="font-semibold text-xs hidden sm:inline">User Info</span>
+              <span className="hidden text-xs font-semibold sm:inline">User Info</span>
             </button>
           </div>
 
           <div className="flex gap-1">
             <button
-              onClick={handleRefresh}
-              className="flex items-center gap-2 px-2 sm:px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 transition-all"
+              onClick={refresh}
+              className="flex items-center gap-2 px-2 py-2 transition-all rounded-md sm:px-3 text-slate-600 hover:bg-slate-100"
               disabled={isRefreshing}
             >
               <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
@@ -133,7 +144,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-2 sm:px-3 py-2 rounded-md text-red-600 hover:bg-red-50 transition-all"
+              className="flex items-center gap-2 px-2 py-2 text-red-600 transition-all rounded-md sm:px-3 hover:bg-red-50"
             >
               <LogOut size={14} />
             </button>
@@ -147,21 +158,21 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+              className="fixed inset-0 z-50 bg-black/50 lg:hidden"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <motion.div
                 initial={{ x: '-100%' }}
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
-                className="bg-white w-64 h-full p-4 shadow-xl"
+                className="w-64 h-full p-4 bg-white shadow-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-slate-800">Menu</h2>
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 hover:bg-slate-100 rounded-lg"
+                    className="p-2 rounded-lg hover:bg-slate-100"
                   >
                     <X size={20} />
                   </button>
@@ -177,7 +188,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
                     }`}
                   >
                     <HardDrive size={18} />
-                    <span className="font-semibold text-sm">Usage & Balance</span>
+                    <span className="text-sm font-semibold">Usage & Balance</span>
                   </button>
 
                   <button
@@ -189,26 +200,26 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
                     }`}
                   >
                     <User size={18} />
-                    <span className="font-semibold text-sm">User Info</span>
+                    <span className="text-sm font-semibold">User Info</span>
                   </button>
 
                   <div className="flex-1" />
 
                   <button
-                    onClick={handleRefresh}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 transition-all"
+                    onClick={refresh}
+                    className="flex items-center gap-3 px-4 py-3 transition-all rounded-lg text-slate-600 hover:bg-slate-100"
                     disabled={isRefreshing}
                   >
                     <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                    <span className="font-semibold text-sm">Refresh</span>
+                    <span className="text-sm font-semibold">Refresh</span>
                   </button>
 
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all"
+                    className="flex items-center gap-3 px-4 py-3 text-red-600 transition-all rounded-lg hover:bg-red-50"
                   >
                     <LogOut size={18} />
-                    <span className="font-semibold text-sm">Logout</span>
+                    <span className="text-sm font-semibold">Logout</span>
                   </button>
                 </div>
               </motion.div>
@@ -218,7 +229,7 @@ export default function Dashboard({ onLogout, demoData }: DashboardProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-3">
+      <div className="flex-1 min-w-0 px-3 overflow-x-hidden overflow-y-auto">
         <AnimatePresence mode="wait">
           {currentPage === 'usage' && (
             <motion.div

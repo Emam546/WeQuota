@@ -5,9 +5,10 @@ interface GaugeProps {
   value: number // Used
   total: number // Total Limit
   size?: number
+  children?: React.ReactNode
 }
 
-export default function Gauge({ value, total, size = 200 }: GaugeProps) {
+export default function Gauge({ value, total, size = 200, children }: GaugeProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const percentage = Math.min(Math.max(value / total, 0), 1)
 
@@ -62,7 +63,7 @@ export default function Gauge({ value, total, size = 200 }: GaugeProps) {
       style={{ width: size, height: size }}
     >
       <svg ref={svgRef} width={size} height={size} className="overflow-visible" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-2">
+      <div className="absolute inset-0 flex flex-col items-center justify-center pb-2 pointer-events-none top-3">
         <div className="text-[#2563EB] mb-1">
           <svg
             width="32"
@@ -82,6 +83,7 @@ export default function Gauge({ value, total, size = 200 }: GaugeProps) {
         <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
           Home Internet
         </span>
+        {children}
       </div>
     </div>
   )

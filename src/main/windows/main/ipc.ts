@@ -1,7 +1,7 @@
 import { ConvertToIpCHandleMainFunc, ConvertToIpCMainFunc } from '@shared/api'
 import { Api as ApiMain } from '@renderer/main'
 import { ObjectEntries } from '@utils/index'
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import { login } from './utils/login'
 import { createWindow as createCaptchaWindow } from '../captcha'
 import {
@@ -28,8 +28,13 @@ export const OnMethods: OnMethodsType = {}
 export const OnceMethods: OnceMethodsType = {}
 export const HandleMethods: HandelMethodsType = {
   login: async (_, data) => await login(data),
-  solveCaptcha: async function (_, image: string, token, number: string) {
-    const win = await createCaptchaWindow({}, { captcha: image, token, number })
+  solveCaptcha: async function (e, image: string, token, number: string) {
+    const main = BrowserWindow.fromWebContents(e.sender)
+    if (!main) throw new Error('undefined window')
+    const win = await createCaptchaWindow({ parent: main }, { captcha: image, token, number })
+    main.on('close', () => {
+      if (!win.isDestroyed()) win.close()
+    })
     return await new Promise((res) => {
       win.on('close', () => {
         res(null)

@@ -16,6 +16,10 @@ export async function createWindow(options: BrowserWindowConstructorOptions, pre
     frame: false,
     width: 700,
     height: 500,
+    alwaysOnTop: true,
+    modal: true,
+    skipTaskbar: true,
+
     webPreferences: {
       ...options.webPreferences,
       sandbox: false,
@@ -46,6 +50,8 @@ export async function createWindow(options: BrowserWindowConstructorOptions, pre
     await win.loadFile(path.join(__dirname, '../windows/Captcha/index.html'))
   }
 
+  win.center()
   win.show()
+  win.focus()
   return win
 }
