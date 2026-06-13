@@ -5,6 +5,7 @@ import { login } from '../api'
 import { useEffect, useState } from 'react'
 import CaptchaModal from './CaptchaModal'
 import axios from 'axios'
+import TypeApplication from './common/TypeApllication'
 interface LoginProps {
   error?: Error | null
   onLogin: (data: Awaited<ReturnType<typeof login>>, password: string, saveData: boolean) => unknown
@@ -134,21 +135,23 @@ export default function Login({ onLogin, error }: LoginProps) {
           </div>
 
           <div className="pt-2 space-y-2 sm:space-y-3">
-            <div className="flex items-center">
-              <input
-                id="startup"
-                name="startup"
-                type="checkbox"
-                defaultChecked
-                className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
-              />
-              <label
-                htmlFor="startup"
-                className="ml-2 sm:ml-3 block text-[11px] sm:text-[13px] text-slate-500 font-medium"
-              >
-                Launch automatically with Windows
-              </label>
-            </div>
+            <TypeApplication defaultState={true} env={'desktop'}>
+              <div className="flex items-center">
+                <input
+                  id="startup"
+                  name="startup"
+                  type="checkbox"
+                  defaultChecked
+                  className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                />
+                <label
+                  htmlFor="startup"
+                  className="ml-2 sm:ml-3 block text-[11px] sm:text-[13px] text-slate-500 font-medium"
+                >
+                  Launch automatically with Windows
+                </label>
+              </div>
+            </TypeApplication>
             <div className="flex items-center">
               <input
                 id="remember-me"
