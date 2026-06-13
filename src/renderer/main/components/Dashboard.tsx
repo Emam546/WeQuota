@@ -26,17 +26,18 @@ export default function Dashboard({
   const [isRefreshing, setIsRefreshing] = useState(__isRefreshing)
   const [refreshKey, setRefreshKey] = useState(0)
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (__isRefreshing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsRefreshing(true)
       return
-    }
-    const t = setTimeout(() => {
-      setIsRefreshing(false)
-      setRefreshKey(prev => prev + 1)
-    }, 1000)
-    return () => {
-      clearTimeout(t)
+    } else if (isRefreshing) {
+      const t = setTimeout(() => {
+        setIsRefreshing(false)
+        setRefreshKey((prev) => prev + 1)
+      }, 1000)
+      return () => {
+        clearTimeout(t)
+      }
     }
   }, [__isRefreshing])
   const handleLogout = async () => {
