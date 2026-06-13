@@ -24,16 +24,19 @@ export default function Dashboard({
   const [currentPage, setCurrentPage] = useState<Page>('usage')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(__isRefreshing)
+  const [refreshKey, setRefreshKey] = useState(0)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (__isRefreshing) setIsRefreshing(true)
-    else {
-      const t = setTimeout(() => {
-        setIsRefreshing(false)
-      }, 1000)
-      return () => {
-        clearTimeout(t)
-      }
+    if (__isRefreshing) {
+      setIsRefreshing(true)
+      return
+    }
+    const t = setTimeout(() => {
+      setIsRefreshing(false)
+      setRefreshKey(prev => prev + 1)
+    }, 1000)
+    return () => {
+      clearTimeout(t)
     }
   }, [__isRefreshing])
   const handleLogout = async () => {
@@ -233,7 +236,7 @@ export default function Dashboard({
         <AnimatePresence mode="wait">
           {currentPage === 'usage' && (
             <motion.div
-              key="usage"
+              key={`usage-${refreshKey}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -250,7 +253,7 @@ export default function Dashboard({
 
           {currentPage === 'userInfo' && (
             <motion.div
-              key="userInfo"
+              key={`userInfo-${refreshKey}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
