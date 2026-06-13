@@ -29,6 +29,12 @@ export namespace ApiMain {
     quitApp(): void
   }
   interface OnceMethods {}
-  interface HandleMethods {}
+  interface HandleMethods {
+    saveFile(data: Buffer, filename: string): Promise<boolean>
+    enableAutoLaunch(): Promise<boolean>
+    disableAutoLaunch(): Promise<boolean>
+    isAutoLaunchEnabled(): Promise<boolean>
+    isAutoStarted(): Promise<boolean>
+  }
   interface HandleOnceMethods {}
 }

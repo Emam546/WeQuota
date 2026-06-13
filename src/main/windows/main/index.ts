@@ -9,8 +9,8 @@ import {
 } from 'electron'
 import path from 'path'
 import { isDev } from '@main/utils'
-import { Context } from 'vm'
 import { convertFunc } from '@main/utils/convert'
+import { Context } from '@renderer/main'
 export async function createWindow(
   options: BrowserWindowConstructorOptions,
   preloadData?: Context

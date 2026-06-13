@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
-import { User, Phone, MapPin, IdCard } from 'lucide-react'
+import { User, Phone, MapPin, IdCard, Power } from 'lucide-react'
 import { CustomerResponse } from '../../types'
+import { useState, useEffect } from 'react'
 
 interface UserInfoProps {
   customerData: CustomerResponse
@@ -15,6 +16,35 @@ export default function UserInfo({ customerData }: UserInfoProps) {
     custId,
     custCode
   } = customerData.body
+
+  const [autoLaunchEnabled, setAutoLaunchEnabled] = useState(false)
+
+  useEffect(() => {
+    // Check auto-launch status on mount (desktop only)
+    if (window.Environment === 'desktop') {
+      window.api.invoke('isAutoLaunchEnabled').then((enabled: boolean) => {
+        setAutoLaunchEnabled(enabled)
+      }).catch(() => {
+        // Ignore errors
+      })
+    }
+  }, [])
+
+  const handleAutoLaunchToggle = async () => {
+    if (window.Environment !== 'desktop') return
+
+    try {
+      if (autoLaunchEnabled) {
+        const result = await window.api.invoke('disableAutoLaunch')
+        setAutoLaunchEnabled(!result)
+      } else {
+        const result = await window.api.invoke('enableAutoLaunch')
+        setAutoLaunchEnabled(result)
+      }
+    } catch (error) {
+      console.error('Failed to toggle auto-launch:', error)
+    }
+  }
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -39,6 +69,36 @@ export default function UserInfo({ customerData }: UserInfoProps) {
           </div>
         </div>
       </div>
+
+      {window.Environment === 'desktop' && (
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Power size={16} className="text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-800">Auto-launch with Windows</h3>
+                <p className="text-[10px] sm:text-xs text-slate-500">
+                  {autoLaunchEnabled ? 'Enabled' : 'Disabled'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleAutoLaunchToggle}
+              className={`relative inline-flex h-5 sm:h-6 w-9 sm:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                autoLaunchEnabled ? 'bg-blue-600' : 'bg-slate-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-3 sm:h-4 w-3 sm:w-4 transform rounded-full bg-white transition-transform ${
+                  autoLaunchEnabled ? 'translate-x-4 sm:translate-x-5' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Desktop: Side-by-side layout for Personal and Contact */}

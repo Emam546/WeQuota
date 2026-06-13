@@ -20,6 +20,7 @@ export default function Login({ onLogin, error }: LoginProps) {
   const { register, handleSubmit, formState, setError } = useForm<FieldValues>()
   const isLoading = formState.isSubmitting
   const [showPassword, setShowPassword] = useState(false)
+  const [autoLaunchEnabled, setAutoLaunchEnabled] = useState(false)
   const [captchaModal, setCaptchaModal] = useState<{
     isOpen: boolean
     captchaImage: string
@@ -36,6 +37,33 @@ export default function Login({ onLogin, error }: LoginProps) {
   useEffect(() => {
     if (error) setError('root', { message: error?.message })
   }, [error])
+
+  useEffect(() => {
+    // Check auto-launch status on mount (desktop only)
+    if (window.Environment === 'desktop') {
+      window.api.invoke('isAutoLaunchEnabled').then((enabled: boolean) => {
+        setAutoLaunchEnabled(enabled)
+      }).catch(() => {
+        // Ignore errors
+      })
+    }
+  }, [])
+
+  const handleAutoLaunchChange = async (enabled: boolean) => {
+    if (window.Environment !== 'desktop') return
+
+    try {
+      if (enabled) {
+        const result = await window.api.invoke('enableAutoLaunch')
+        setAutoLaunchEnabled(result)
+      } else {
+        const result = await window.api.invoke('disableAutoLaunch')
+        setAutoLaunchEnabled(!result)
+      }
+    } catch (error) {
+      console.error('Failed to toggle auto-launch:', error)
+    }
+  }
 
   useEffect(() => {
     const handleCaptcha = (event: CustomEvent) => {
@@ -141,7 +169,8 @@ export default function Login({ onLogin, error }: LoginProps) {
                   id="startup"
                   name="startup"
                   type="checkbox"
-                  defaultChecked
+                  checked={autoLaunchEnabled}
+                  onChange={(e) => handleAutoLaunchChange(e.target.checked)}
                   className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
                 />
                 <label
