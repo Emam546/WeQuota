@@ -12,22 +12,13 @@ export default function App() {
       window.api.send('closeWindow')
     }
   }, [getQuery.data, getQuery.isLoading, isLoadingCredentials])
-  if (getQuery.isLoading || isLoadingCredentials) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="flex flex-col items-center animate-pulse">
-          <div className="w-12 h-12 mb-4 bg-purple-200 rounded-full"></div>
-          <div className="w-24 h-4 bg-purple-100 rounded"></div>
-        </div>
-      </div>
-    )
-  }
+
   if (getQuery.isError) return <p>{getQuery.error.message}</p>
-  if (!getQuery.isSuccess) return null
   return (
     <div className="bg-red-500" ref={ref}>
       <MiniUsage
-        data={getQuery.data}
+        data={getQuery.data || null}
+        isLoading={getQuery.isLoading || isLoadingCredentials}
         onOpenMain={() => {
           window.api.invoke('showMainWindow')
         }}
