@@ -1,72 +1,10 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { useState, useEffect } from 'react'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
-import { SecureStorage } from './lib/storage'
-import { useQuery } from '@tanstack/react-query'
-import { login, getData, LoginData } from './api'
-import { BodyData as LoginBodyData } from '@main/windows/main/utils/login'
-interface SavedData extends LoginData {
-  userName: string
-  password: string
-}
-interface Credentials extends SavedData {
-  saved: boolean
-}
+import { useCredentials } from '@renderer/utils/useCredentials'
+
 export default function App() {
-  const [credentials, setCredentials] = useState<Credentials | null>(null)
-  const getQuery = useQuery({
-    queryKey: ['dashboard', credentials?.userName],
-    queryFn: async () => {
-      if (!credentials) throw new Error('undefined state should not be triggered')
-      try {
-        return await getData({ ...credentials! })
-      } catch (error) {
-        window.log(error)
-        const data = await login({
-          number: credentials.userName,
-          password: credentials.password
-        })
-        return await getData(await handleLogin(data, credentials!.password, credentials.saved))
-      }
-    },
-    retry: 0,
-    enabled: credentials != null,
-    retryOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 10 * 60 * 1000
-  })
-  useEffect(() => {
-    SecureStorage.getSavedCredentials<SavedData>().then((saved) => {
-      if (saved.success) if (saved.data) setCredentials({ ...saved.data, saved: true })
-    })
-  }, [])
-  const handleLogin = async (data: LoginBodyData, password: string, save: boolean) => {
-    const credentials: Credentials = {
-      subscriberId: data.subscriber.subscriberId,
-      utoken: data.uToken,
-      acctId: data.subscriber.accountId,
-      custId: data.subscriber.custId,
-      password: password,
-      token: data.token,
-      userName: data.subscriber.servNumber.slice(3),
-      saved: save
-    }
-    if (save) await SecureStorage.saveCredentials(data.subscriber.servNumber.slice(3), credentials)
-    setCredentials(credentials)
-    return credentials
-  }
-
-  const handleLogout = async () => {
-    await SecureStorage.clearSession()
-    setCredentials(null)
-  }
-
-  if (getQuery.isLoading) {
+  const { getQuery, handleLogin, handleLogout, isLoadingCredentials } = useCredentials()
+  if (getQuery.isLoading || isLoadingCredentials) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center animate-pulse">
@@ -94,7 +32,7 @@ export default function App() {
           <Login
             error={getQuery.error}
             onLogin={async (data, password, save) => {
-              setCredentials(await handleLogin(data, password, save))
+              await handleLogin(data, password, save)
             }}
           />
         )}

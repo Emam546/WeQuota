@@ -5,7 +5,6 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import { ApiMain } from '@shared/api'
 import { SaveFile } from './saveFile'
 import { logger } from '../logger'
-import AutoLaunch from 'electron-auto-launch'
 type OnMethodsType = {
   [K in keyof ApiMain.OnMethods]: ConvertToIpCMainFunc<ApiMain.OnMethods[K]>
 }
@@ -67,6 +66,7 @@ export const OnMethods: OnMethodsType = {
   quitApp: function (): void {
     app.quit()
   },
+
   alert(event, message, title) {
     const window = BrowserWindow.fromWebContents(event.sender)
     if (!window) return
@@ -98,51 +98,6 @@ export const HandleMethods: HandelMethodsType = {
     const res = await SaveFile(data, filename)
     if (!res) return false
     return true
-  },
-  async enableAutoLaunch() {
-    try {
-      const autoLauncher = new AutoLaunch({
-        name: app.getName(),
-        path: app.getPath('exe')
-      })
-      const enabled = await autoLauncher.enable()
-      logger.info(`Auto-launch enabled: ${enabled}`)
-      return enabled ?? false
-    } catch (error) {
-      logger.err('Failed to enable auto-launch', true)
-      return false
-    }
-  },
-  async disableAutoLaunch() {
-    try {
-      const autoLauncher = new AutoLaunch({
-        name: app.getName(),
-        path: app.getPath('exe')
-      })
-      const disabled = await autoLauncher.disable()
-      logger.info(`Auto-launch disabled: ${disabled}`)
-      return disabled ?? false
-    } catch (error) {
-      logger.err('Failed to disable auto-launch', true)
-      return false
-    }
-  },
-  async isAutoLaunchEnabled() {
-    try {
-      const autoLauncher = new AutoLaunch({
-        name: app.getName(),
-        path: app.getPath('exe')
-      })
-      const enabled = await autoLauncher.isEnabled()
-      return enabled
-    } catch (error) {
-      logger.err('Failed to check auto-launch status', true)
-      return false
-    }
-  },
-  async isAutoStarted() {
-    const loginItemSettings = app.getLoginItemSettings()
-    return loginItemSettings.openAtLogin && loginItemSettings.wasOpenedAtLogin
   }
 }
 export const HandleOnceMethods: HandelOnceMethodsType = {}

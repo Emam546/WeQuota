@@ -36,6 +36,18 @@ const FunctionData: Api.HandleMethods = {
       })
       window.dispatchEvent(event)
     })
+  },
+  enableAutoLaunch: function (): Promise<boolean> {
+    throw new Error('Function not implemented.')
+  },
+  disableAutoLaunch: function (): Promise<boolean> {
+    throw new Error('Function not implemented.')
+  },
+  isAutoLaunchEnabled: function (): Promise<boolean> {
+    throw new Error('Function not implemented.')
+  },
+  isAutoStarted: function (): Promise<boolean> {
+    throw new Error('Function not implemented.')
   }
 }
 export function getFunctionInvoke<K extends keyof Api.HandleMethods>(

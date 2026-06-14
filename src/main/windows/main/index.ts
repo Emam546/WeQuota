@@ -11,16 +11,17 @@ import path from 'path'
 import { isDev } from '@main/utils'
 import { convertFunc } from '@main/utils/convert'
 import { Context } from '@renderer/main'
+import { MainWindow } from './window'
 export async function createWindow(
   options: BrowserWindowConstructorOptions,
   preloadData?: Context
 ) {
   // Create the browser window.
 
-  const win = new BrowserWindow({
+  const win = new MainWindow({
     ...options,
-    resizable: false,
-    maximizable: false,
+    resizable: true,
+    maximizable: true,
     show: false,
     frame: false,
     width: 500,
@@ -117,5 +118,17 @@ export async function createWindow(
     height: win.getBounds().height - titleBarView.getBounds().height
   })
   win.show()
+  win.maximize()
   return win
+}
+export function showMainWindow() {
+  if (MainWindow.MainWindow) {
+    const mainWindow = MainWindow.MainWindow
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
+    mainWindow.show()
+    mainWindow.focus()
+    mainWindow.maximize()
+  } else createWindow({})
 }

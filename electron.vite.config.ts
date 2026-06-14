@@ -19,6 +19,7 @@ export default defineConfig({
         input: {
           main: resolve(__dirname, 'src/renderer/main/index.html'),
           frame: resolve(__dirname, 'src/renderer/frame/index.html'),
+          mini: resolve(__dirname, 'src/renderer/mini/index.html'),
           captcha: resolve(__dirname, 'src/renderer/captcha/index.html')
         }
       }

@@ -1,11 +1,16 @@
 import './helpers/ipcMain'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { createWindow } from './windows/main'
+import { createWindow, showMainWindow } from './windows/main'
+import { createMiniWindow, showMiniWindow, toggleMiniWindow } from './windows/mini'
+import path from 'path'
+import { MainWindow } from './windows/main/window'
 
 // Check if app was started at login (auto-launch)
 const loginItemSettings = app.getLoginItemSettings()
 const isAutoStarted = loginItemSettings.openAtLogin && loginItemSettings.wasOpenedAtLogin
+
+let tray: Tray | null = null
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -20,10 +25,37 @@ app.whenReady().then(async () => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+  await createMiniWindow()
+  if (!isAutoStarted) await createWindow({})
+  showMiniWindow()
+  // Create system tray
+  const trayIcon = nativeImage.createFromPath(path.join(__dirname, '../../resources/icon.png'))
+  tray = new Tray(trayIcon.resize({ width: 16, height: 16 }))
 
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show Main Window',
+      click: () => {
+        showMainWindow()
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Quit',
+      click: () => {
+        app.quit()
+      }
+    }
+  ])
+
+  tray.setToolTip('NetQuota - Monitor your data usage')
+  tray.setContextMenu(contextMenu)
+
+  // Double-click to toggle mini window
+  tray.on('double-click', async () => {
+    showMiniWindow()
+  })
   // IPC test
-
-  await createWindow({}, { isAutoStarted })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

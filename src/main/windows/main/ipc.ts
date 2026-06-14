@@ -1,7 +1,7 @@
 import { ConvertToIpCHandleMainFunc, ConvertToIpCMainFunc } from '@shared/api'
 import { Api as ApiMain } from '@renderer/main'
 import { ObjectEntries } from '@utils/index'
-import { BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { login } from './utils/login'
 import { createWindow as createCaptchaWindow } from '../captcha'
 import {
@@ -11,6 +11,8 @@ import {
   getQuotaData,
   getSubscriberData
 } from './utils/data'
+import { logger } from '@main/helpers/logger'
+import AutoLaunch from 'electron-auto-launch'
 
 type OnMethodsType = {
   [K in keyof ApiMain.OnMethods]: ConvertToIpCMainFunc<ApiMain.OnMethods[K]>
@@ -58,6 +60,51 @@ export const HandleMethods: HandelMethodsType = {
   },
   getSubscriberData: function (_, ...args) {
     return getSubscriberData(...args)
+  },
+  async enableAutoLaunch() {
+    try {
+      const autoLauncher = new AutoLaunch({
+        name: app.getName(),
+        path: app.getPath('exe')
+      })
+      const enabled = await autoLauncher.enable()
+      logger.info(`Auto-launch enabled: ${enabled}`)
+      return enabled ?? false
+    } catch (error) {
+      logger.err('Failed to enable auto-launch', true)
+      return false
+    }
+  },
+  async disableAutoLaunch() {
+    try {
+      const autoLauncher = new AutoLaunch({
+        name: app.getName(),
+        path: app.getPath('exe')
+      })
+      const disabled = await autoLauncher.disable()
+      logger.info(`Auto-launch disabled: ${disabled}`)
+      return disabled ?? false
+    } catch (error) {
+      logger.err('Failed to disable auto-launch', true)
+      return false
+    }
+  },
+  async isAutoLaunchEnabled() {
+    try {
+      const autoLauncher = new AutoLaunch({
+        name: app.getName(),
+        path: app.getPath('exe')
+      })
+      const enabled = await autoLauncher.isEnabled()
+      return enabled
+    } catch (error) {
+      logger.err('Failed to check auto-launch status', true)
+      return false
+    }
+  },
+  async isAutoStarted() {
+    const loginItemSettings = app.getLoginItemSettings()
+    return loginItemSettings.openAtLogin && loginItemSettings.wasOpenedAtLogin
   }
 }
 export const HandleOnceMethods: HandelOnceMethodsType = {}

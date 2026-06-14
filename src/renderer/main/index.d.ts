@@ -27,6 +27,10 @@ export namespace Api {
       token: string,
       number: string
     ): Promise<{ token: string; imgCode: string } | null>
+    enableAutoLaunch(): Promise<boolean>
+    disableAutoLaunch(): Promise<boolean>
+    isAutoLaunchEnabled(): Promise<boolean>
+    isAutoStarted(): Promise<boolean>
   }
   interface HandleOnceMethods {}
 }
