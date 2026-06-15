@@ -22,13 +22,13 @@
         "./utils/*"
       ],
       "@main/*": [
-        "./src/main/*"
+        "./app/main/*"
       ],
     }
   },
   "include": [
     "server",
-    "src/main",
+    "app/main",
     "utils"
   ],
   "exclude": [

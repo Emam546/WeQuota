@@ -1,0 +1,49 @@
+{
+  "header": { "retCode": "0", "validateResults": [] },
+  "body": {
+    "utoken": "8F8BBA5FEF6287E7FE25F2002A59A6779755AB764D9B6264",
+    "loginId": "FBB473862133",
+    "loginType": "0",
+    "token": "605B0BCCAA0ED2EEF60CE2BF9108E3D6665CE954C4BE0A29",
+    "uToken": "8F8BBA5FEF6287E7FE25F2002A59A6779755AB764D9B6264",
+    "needChangePwd": "N",
+    "customer": {
+      "custId": "11035589192",
+      "custName": "امام فؤاد محمد عاشور",
+      "custGender": "1",
+      "custCode": "11022134206",
+      "custType": "1",
+      "custClass": "1",
+      "individualInfo": {
+        "firstName": "امام",
+        "lastName": "فؤاد محمد عاشور",
+        "gender": "1",
+        "birthday": 128988000000
+      },
+      "contactPersonList": [],
+      "addressInfoList": [],
+      "bankCards": []
+    },
+    "account": { "acctId": "11050094534", "acctCode": "11043634812", "billCycle": [] },
+    "subscriber": {
+      "subscriberId": "78469060",
+      "custId": "11035589192",
+      "accountId": "11050094534",
+      "primaryOfferingId": "710007",
+      "servNumber": "FBB473862133",
+      "paymentType": "0",
+      "state": "2",
+      "statusDetail": "00000000",
+      "status": "2",
+      "networkType": "4",
+      "firstContactChannel": "",
+      "firstContactNumber": "1091907365",
+      "writtenLang": "2063",
+      "voiceRoaming": "0",
+      "smsRoaming": "3",
+      "dataRoaming": "3",
+      "isDelegatorSubs": "N"
+    },
+    "ownerList": []
+  }
+}

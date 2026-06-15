@@ -2,21 +2,27 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "./",
-    "types": ["jest","node"],
+    "types": [
+      "jest",
+      "node"
+    ],
     "paths": {
       "@renderer/*": [
-        "./src/renderer/*"
+        "./app/renderer/*"
       ],
       "@main/*": [
-        "./src/main/*"
+        "./app/main/*"
       ],
       "@utils/*": [
         "./utils/*"
       ],
       "@shared/*": [
-        "./src/shared/*"
+        "./shared/*"
       ]
     }
   },
-  "include": ["**/spec","spec"]
+  "include": [
+    "**/spec",
+    "spec"
+  ]
 }

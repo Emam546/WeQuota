@@ -9,7 +9,6 @@ import EnvVars from '@serv/declarations/major/EnvVars'
 import HttpStatusCodes from '@serv/declarations/major/HttpStatusCodes'
 import { NodeEnvs } from '@serv/declarations/enums'
 import { RouteError } from '@serv/declarations/classes'
-import path from 'path'
 
 // **** Init express **** //
 
@@ -26,8 +25,7 @@ app.use(cookieParser(EnvVars.cookieProps.secret))
 if (EnvVars.nodeEnv === NodeEnvs.Dev) {
   app.use(morgan('dev'))
 }
-const reactBuildPath = path.join(__dirname, '../../out/windows')
-app.use(express.static(reactBuildPath))
+
 // Security
 if (EnvVars.nodeEnv === NodeEnvs.Production) {
   app.use(helmet())
@@ -47,7 +45,5 @@ app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
 
   return res.status(status).json({ msg: 'error', status: false, error: err.message })
 })
-app.get('*', (req, res) => {
-  res.sendFile(path.join(reactBuildPath, 'main/index.html'))
-})
+
 export default app
