@@ -94,6 +94,8 @@ export async function createWindow(
     await titleBarView.webContents.loadURL(
       `${process.env['ELECTRON_RENDERER_URL'] as string}/frame/index.html`
     )
+    webView.webContents.openDevTools()
+
     globalShortcut.register('Ctrl+Shift+I', () => {
       if (webView.webContents.isDevToolsOpened()) {
         webView.webContents.closeDevTools()

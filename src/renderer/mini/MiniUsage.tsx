@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { HardDrive, Wallet, TrendingUp, Maximize2, X, Loader2 } from 'lucide-react'
+import { HardDrive, Wallet, TrendingUp, Maximize2, X, Loader2, WifiOff } from 'lucide-react'
 import { DemoData } from '../main/types'
 import style from '../Captcha/style.module.scss'
 import classNames from 'classnames'
@@ -7,6 +7,8 @@ import classNames from 'classnames'
 interface MiniUsageProps {
   data: DemoData | null
   isLoading?: boolean
+  error?: string | null
+  onRetry?: () => void
   onOpenMain: () => void
   onClose: () => void
 }
@@ -14,10 +16,13 @@ interface MiniUsageProps {
 export default function MiniUsage({
   data,
   isLoading: isDataLoading = false,
+  error,
+  onRetry,
   onOpenMain,
   onClose
 }: MiniUsageProps) {
   const isLoading = isDataLoading || !data
+  const hasError = error || (!data && !isDataLoading)
 
   const { quota, balance } = data || { quota: { body: [] }, balance: { body: { balanceInfo: [] } } }
 
@@ -62,7 +67,27 @@ export default function MiniUsage({
 
       {/* Content */}
       <div className="p-4 space-y-4">
-        {isLoading ? (
+        {hasError ? (
+          // Error State
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-8 space-y-3"
+          >
+            <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+              <WifiOff size={24} className="text-red-400" />
+            </div>
+            <div className="text-sm text-white/80 text-center">No connection</div>
+            {onRetry && (
+              <button
+                onClick={onRetry}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+            )}
+          </motion.div>
+        ) : isLoading ? (
           // Loading State
           <motion.div
             initial={{ opacity: 0 }}

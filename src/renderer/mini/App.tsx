@@ -19,6 +19,8 @@ export default function App() {
       <MiniUsage
         data={getQuery.data || null}
         isLoading={getQuery.isLoading || isLoadingCredentials}
+        error={getQuery.isError ? 'Failed to load data' : null}
+        onRetry={() => getQuery.refetch()}
         onOpenMain={() => {
           window.api.invoke('showMainWindow')
         }}

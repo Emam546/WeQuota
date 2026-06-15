@@ -10,8 +10,29 @@ export interface SavedData extends LoginData {
 export interface Credentials extends SavedData {
   saved: boolean
 }
+// useInternetStatus.ts
+
+export function useInternetStatus() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  return isOnline
+}
 export function useCredentials() {
   const [credentials, setCredentials] = useState<Credentials | null>(null)
+  const isOnline = useInternetStatus()
   const [isLoadingCredentials, setLoadingCredentials] = useState(true)
   const getQuery = useQuery({
     queryKey: ['dashboard', credentials?.userName],
@@ -30,7 +51,7 @@ export function useCredentials() {
       }
     },
     retry: 0,
-    enabled: credentials != null,
+    enabled: credentials != null && isOnline,
     retryOnMount: false,
     refetchOnWindowFocus: false,
     staleTime: 10 * 60 * 1000
@@ -61,5 +82,5 @@ export function useCredentials() {
     await SecureStorage.clearSession()
     setCredentials(null)
   }
-  return { isLoadingCredentials, credentials, getQuery, handleLogin, handleLogout }
+  return { isLoadingCredentials, credentials, getQuery, handleLogin, handleLogout, isOnline }
 }

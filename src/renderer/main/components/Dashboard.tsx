@@ -25,21 +25,29 @@ export default function Dashboard({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(__isRefreshing)
   const [refreshKey, setRefreshKey] = useState(0)
+
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | undefined
+
     if (__isRefreshing) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsRefreshing(true)
-      return
     } else if (isRefreshing) {
-      const t = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setIsRefreshing(false)
         setRefreshKey((prev) => prev + 1)
       }, 1000)
-      return () => {
-        clearTimeout(t)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
       }
     }
   }, [__isRefreshing])
+
+  // Show NoInternet if there's an error or no data
+
   const handleLogout = async () => {
     await SecureStorage.clearSession()
     onLogout()
@@ -235,7 +243,7 @@ export default function Dashboard({
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 px-3 overflow-x-hidden overflow-y-auto">
         <AnimatePresence mode="wait">
-          {currentPage === 'usage' && (
+          {currentPage === 'usage' && demoData && (
             <motion.div
               key={`usage-${refreshKey}`}
               initial={{ opacity: 0, y: 10 }}
@@ -252,7 +260,7 @@ export default function Dashboard({
             </motion.div>
           )}
 
-          {currentPage === 'userInfo' && (
+          {currentPage === 'userInfo' && demoData && (
             <motion.div
               key={`userInfo-${refreshKey}`}
               initial={{ opacity: 0, y: 10 }}

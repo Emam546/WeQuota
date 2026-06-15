@@ -1,9 +1,11 @@
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import { useCredentials } from '@renderer/utils/useCredentials'
+import NoInternet from './components/NoInternet'
 
 export default function App() {
-  const { getQuery, handleLogin, handleLogout, isLoadingCredentials } = useCredentials()
+  const { getQuery, handleLogin, handleLogout, isLoadingCredentials, isOnline } = useCredentials()
+  if (!isOnline) return <NoInternet isRetrying={getQuery.isPending} onRetry={getQuery.refetch} />
   if (getQuery.isLoading || isLoadingCredentials) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
