@@ -1,23 +1,23 @@
-appId: com.electron.app
-productName: electron-app
+appId: com.weQuota.app
+productName: We Quota
 directories:
   buildResources: build
 files:
-  - '!**/.vscode/*'
-  - '!src/*'
-  - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - out/**/*
+  - build/**/*
 asarUnpack:
   - resources/**
 win:
-  executableName: electron-app
+  executableName: we-quota
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  artifactName: temp.${ext}
   createDesktopShortcut: always
+  oneClick: false  # Set to true if you want one-click installation
+  perMachine: true  # Choose per-machine installation mode
+  createStartMenuShortcut: true  # Creates a start menu shortcut
+  shortcutName: ${productName}
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -38,6 +38,3 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates

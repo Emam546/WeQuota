@@ -11,12 +11,15 @@ import childProcess from 'child_process'
 ;(async () => {
   try {
     // Remove current build
+    console.log('Removing ./dist')
     await remove('./dist/')
     // Copy back-end files
-    await exec('tsc --build tsconfig.server.json', './')
-    console.log('finish building server')
+    console.log('Building server with tsconfig.prod.json')
+    await exec('tsc --build tsconfig.prod.json', './')
+    console.log('Finished building server into ./dist')
   } catch (err) {
     console.error(err)
+    process.exitCode = 1
   }
 })()
 
@@ -24,11 +27,7 @@ import childProcess from 'child_process'
  * Remove file
  */
 function remove(loc: string): Promise<void> {
-  return new Promise((res, rej) => {
-    return fs.remove(loc, (err) => {
-      return !err ? rej(err) : res()
-    })
-  })
+  return fs.remove(loc)
 }
 
 /**

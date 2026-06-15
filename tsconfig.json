@@ -51,7 +51,7 @@
     "shared",
     "utils",
     "./components",
-    "src/tailwind.config.js",
+    "src/tailwind.config.js", "next.config.ts",
   ],
   "exclude": [
     "node_modules",

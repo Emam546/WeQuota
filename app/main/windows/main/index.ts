@@ -17,7 +17,7 @@ import { isProd } from '../../utils'
 
 const appServe = isProd
   ? serve({
-      directory: path.join(__dirname, '../renderer')
+      directory: path.join(__dirname, '../next')
     })
   : null
 export async function createWindow(

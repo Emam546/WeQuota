@@ -2,9 +2,8 @@ import './helpers/ipcMain'
 import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow, showMainWindow } from './windows/main'
-import { createMiniWindow, showMiniWindow, toggleMiniWindow } from './windows/mini'
+import { createMiniWindow, showMiniWindow } from './windows/mini';
 import path from 'path'
-import { MainWindow } from './windows/main/window'
 
 // Check if app was started at login (auto-launch)
 const loginItemSettings = app.getLoginItemSettings()

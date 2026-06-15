@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApiResponse } from '@main/windows/main/utils'
+import type { Response as LoginResponse } from '@main/windows/main/utils/login'
 import { throwError } from '@utils/errors'
 import { hasProperty, ObjectEntries } from '@utils/index'
 import { DemoData } from '@src/types'
@@ -61,11 +62,11 @@ export function getFunctionInvoke<K extends keyof Api.HandleMethods>(
 export async function login(data: Parameters<ApiMain.HandleMethods['login']>[0]) {
   let infoToken: { imgCode: string; token: string } | null = null
   while (true) {
-    const result = await getFunctionInvoke('login', { ...data, ...infoToken })
+    const result: LoginResponse = await getFunctionInvoke('login', { ...data, ...(infoToken ?? {}) })
     if (result.status == 'Blocked') throw new Error('You have been blocked')
 
     if (result.requireInteraction) {
-      const res = await getFunctionInvoke(
+      const res: { token: string; imgCode: string } | null = await getFunctionInvoke(
         'solveCaptcha',
         result.captcha,
         result.token,
@@ -75,8 +76,11 @@ export async function login(data: Parameters<ApiMain.HandleMethods['login']>[0])
       infoToken = res
       continue
     }
-    if (result.data.header.retCode != '0')
-      throw throwError(result.data.header.errorNo!, result.data.header.errorMsg)
+    if (result.data.header.retCode != '0') {
+      if (hasProperty(result.data.header, 'errorNo'))
+        throw throwError(result.data.header.errorNo, result.data.header.errorMsg)
+      throw new Error('unexpected login response')
+    }
     if (hasProperty(result.data, 'body')) return result.data.body
     throw new Error('no data in the response')
   }
@@ -102,7 +106,7 @@ export async function getData({
     customer: getFunctionInvoke('getInfoData', { custId }, { token, utoken })
   }
   const objEntries = ObjectEntries(funcs)
-  const acc = {}
+  const acc: Partial<Record<keyof DemoData, ApiResponse<unknown>>> = {}
   for (let i = 0; i < objEntries.length; i++) {
     const result = await objEntries[i][1]
     if (hasProperty(result, 'body')) acc[objEntries[i][0]] = result

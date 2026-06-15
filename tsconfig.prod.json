@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.server.json",
+  "compilerOptions": {
+    "sourceMap": false,
+    "removeComments": true
+  },
+  "include": [
+    "server/src/**/*.ts",
+    "app/main/windows/main/utils/**/*.ts",
+    "utils/index.ts"
+  ],
+  "exclude": [
+    "app/main/windows/main/utils/spec",
+    "server/spec",
+    "build.ts"
+  ]
+}
