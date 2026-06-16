@@ -62,33 +62,22 @@ export const HandleMethods: HandelMethodsType = {
     return getSubscriberData(...args)
   },
   async enableAutoLaunch() {
-    try {
-      const autoLauncher = new AutoLaunch({
-        name: app.getName(),
-        path: app.getPath('exe')
-      })
-      const enabled = await autoLauncher.enable()
-      logger.info(`Auto-launch enabled: ${enabled}`)
-      return enabled ?? false
-    } catch (error) {
-      console.error(error)
-      logger.err('Failed to enable auto-launch', true)
-      return false
-    }
+    const autoLauncher = new AutoLaunch({
+      name: app.getName(),
+      path: app.getPath('exe')
+    })
+    const enabled = await autoLauncher.enable()
+    logger.info(`Auto-launch enabled: ${enabled}`)
+    return enabled ?? false
   },
   async disableAutoLaunch() {
-    try {
-      const autoLauncher = new AutoLaunch({
-        name: app.getName(),
-        path: app.getPath('exe')
-      })
-      const disabled = await autoLauncher.disable()
-      logger.info(`Auto-launch disabled: ${disabled}`)
-      return disabled ?? false
-    } catch (error) {
-      logger.err('Failed to disable auto-launch', true)
-      return false
-    }
+    const autoLauncher = new AutoLaunch({
+      name: app.getName(),
+      path: app.getPath('exe')
+    })
+    const disabled = await autoLauncher.disable()
+    logger.info(`Auto-launch disabled: ${disabled}`)
+    return disabled ?? false
   },
   async isAutoLaunchEnabled() {
     try {
@@ -100,6 +89,7 @@ export const HandleMethods: HandelMethodsType = {
       return enabled
     } catch (error) {
       logger.err('Failed to check auto-launch status', true)
+      logger.err(error, true)
       return false
     }
   },
