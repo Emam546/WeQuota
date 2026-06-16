@@ -22,7 +22,7 @@ export default function Dashboard() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | undefined
 
-    if (getQuery.isRefetching) {
+    if (getQuery.isPending) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsRefreshing(true)
     } else if (isRefreshing) {
@@ -37,7 +37,7 @@ export default function Dashboard() {
         clearTimeout(timeoutId)
       }
     }
-  }, [getQuery.isRefetching])
+  }, [getQuery.isPending])
   const demoData = getQuery.data
   // Show NoInternet if there's an error or no data
   useEffect(() => {
