@@ -5,6 +5,8 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import { ApiMain } from '@shared/api'
 import { SaveFile } from './saveFile'
 import { logger } from '../logger'
+import path from 'path'
+import fs from 'fs'
 type OnMethodsType = {
   [K in keyof ApiMain.OnMethods]: ConvertToIpCMainFunc<ApiMain.OnMethods[K]>
 }
@@ -17,6 +19,7 @@ type HandelMethodsType = {
 type HandelOnceMethodsType = {
   [K in keyof ApiMain.HandleOnceMethods]: ConvertToIpCHandleMainFunc<ApiMain.HandleOnceMethods[K]>
 }
+const filePath = path.join(app.getPath('userData'), 'data.user')
 export const OnMethods: OnMethodsType = {
   log(_, arg: string) {
     logger.info(arg)
@@ -101,6 +104,21 @@ export const HandleMethods: HandelMethodsType = {
     const res = await SaveFile(data, filename)
     if (!res) return false
     return true
+  },
+  saveCredentials: function (_, username: string, data: string): void {
+    fs.writeFileSync(filePath, btoa(JSON.stringify(data)))
+  },
+  getCredentials: function <T>(
+    event: Electron.CrossProcessExports.IpcMainInvokeEvent,
+    username: string
+  ): { success: false } | { success: true; data: T; username: string } {
+    if (fs.existsSync(filePath))
+      return {
+        success: true,
+        username,
+        data: JSON.parse(atob(fs.readFileSync(filePath).toString()))
+      }
+    return { success: false }
   }
 }
 export const HandleOnceMethods: HandelOnceMethodsType = {}

@@ -21,7 +21,7 @@ export default function MiniUsage({
   onOpenMain,
   onClose
 }: MiniUsageProps) {
-  const isLoading = isDataLoading || !data
+  const isLoading = isDataLoading
   const hasError = error || (!data && !isDataLoading)
 
   const { quota, balance } = data || { quota: { body: [] }, balance: { body: { balanceInfo: [] } } }
@@ -67,7 +67,17 @@ export default function MiniUsage({
 
       {/* Content */}
       <div className="p-4 space-y-4">
-        {hasError ? (
+        {isLoading ? (
+          // Loading State
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-12 space-y-4"
+          >
+            <Loader2 size={48} className="text-blue-500 animate-spin" />
+            <div className="text-sm text-white/60">Loading usage data...</div>
+          </motion.div>
+        ) : hasError ? (
           // Error State
           <motion.div
             initial={{ opacity: 0 }}
@@ -87,16 +97,6 @@ export default function MiniUsage({
                 Retry
               </button>
             )}
-          </motion.div>
-        ) : isLoading ? (
-          // Loading State
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-12 space-y-4"
-          >
-            <Loader2 size={48} className="text-blue-500 animate-spin" />
-            <div className="text-sm text-white/60">Loading usage data...</div>
           </motion.div>
         ) : (
           <>
