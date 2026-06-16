@@ -19,31 +19,39 @@ const STORAGE_KEYS = {
 export const SecureStorage = {
   /** Stores credentials securely */
   async saveCredentials(username: string, data?: unknown) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, username)
-    localStorage.setItem(STORAGE_KEYS.AUTO_LOGIN, 'true')
+    if (window.Environment == 'desktop') {
+      await window.api.invoke('saveCredentials', username, data)
+    } else {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, username)
+      localStorage.setItem(STORAGE_KEYS.AUTO_LOGIN, 'true')
 
-    if (data) {
-      // Simulation of Windows Credential Manager storage
-      console.log(`[SECURE] Storing credentials for ${username} in Credential Manager...`)
-      localStorage.setItem(`${SERVICE_NAME}_${username}_secret`, btoa(JSON.stringify(data)))
+      if (data) {
+        // Simulation of Windows Credential Manager storage
+        console.log(`[SECURE] Storing credentials for ${username} in Credential Manager...`)
+        localStorage.setItem(`${SERVICE_NAME}_${username}_secret`, btoa(JSON.stringify(data)))
+      }
     }
   },
 
   /** Retrieves credentials for auto-login */
   async getSavedCredentials<T>() {
-    const isAutoLoginEnabled = localStorage.getItem(STORAGE_KEYS.AUTO_LOGIN) === 'true'
-    const username = localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
+    if (window.Environment == 'desktop') {
+      return await window.api.invoke('getCredentials')
+    } else {
+      const isAutoLoginEnabled = localStorage.getItem(STORAGE_KEYS.AUTO_LOGIN) === 'true'
+      const username = localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
 
-    if (isAutoLoginEnabled && username) {
-      const secret = localStorage.getItem(`${SERVICE_NAME}_${username}_secret`)
-      return {
-        success: true,
-        username,
-        data: secret ? (JSON.parse(atob(secret)) as T) : null
+      if (isAutoLoginEnabled && username) {
+        const secret = localStorage.getItem(`${SERVICE_NAME}_${username}_secret`)
+        return {
+          success: true,
+          username,
+          data: secret ? (JSON.parse(atob(secret)) as T) : null
+        }
       }
-    }
 
-    return { success: false }
+      return { success: false }
+    }
   },
 
   /** Clears all stored data */
