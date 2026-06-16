@@ -31,6 +31,7 @@ export namespace ApiMain {
   }
   interface OnceMethods {}
   interface HandleMethods {
+    clearCredentials(): void
     saveCredentials(username: string, data: string): void
     getCredentials<T>(username: string): T
     saveFile(data: Buffer, filename: string): Promise<boolean>

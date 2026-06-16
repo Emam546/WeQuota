@@ -105,7 +105,7 @@ export const HandleMethods: HandelMethodsType = {
     if (!res) return false
     return true
   },
-  saveCredentials: function (_, username: string, data: string): void {
+  saveCredentials: function (_, username: string, data?: unknown): void {
     fs.writeFileSync(filePath, btoa(JSON.stringify(data)))
   },
   getCredentials: function <T>(
@@ -119,6 +119,9 @@ export const HandleMethods: HandelMethodsType = {
         data: JSON.parse(atob(fs.readFileSync(filePath).toString()))
       }
     return { success: false }
+  },
+  clearCredentials: function (): void {
+    if (fs.existsSync(filePath)) fs.rmSync(filePath)
   }
 }
 export const HandleOnceMethods: HandelOnceMethodsType = {}

@@ -56,10 +56,14 @@ export const SecureStorage = {
 
   /** Clears all stored data */
   async clearSession() {
-    localStorage.removeItem(STORAGE_KEYS.AUTO_LOGIN)
-    const username = localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
-    if (username) {
-      localStorage.removeItem(`${SERVICE_NAME}_${username}_secret`)
+    if (window.Environment == 'desktop') {
+      return await window.api.invoke('clearCredentials')
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.AUTO_LOGIN)
+      const username = localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
+      if (username) {
+        localStorage.removeItem(`${SERVICE_NAME}_${username}_secret`)
+      }
     }
   }
 }
