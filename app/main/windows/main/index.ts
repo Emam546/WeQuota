@@ -15,9 +15,11 @@ import { MainWindow } from './window'
 import { isProd } from '../../utils'
 import serve from 'electron-serve'
 
-const appServe = serve({
-  directory: path.join(__dirname, '../next')
-})
+const appServe = isProd
+  ? serve({
+      directory: path.join(__dirname, '../next')
+    })
+  : null
 export async function createWindow(
   options: BrowserWindowConstructorOptions,
   preloadData?: Context

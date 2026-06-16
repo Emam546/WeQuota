@@ -35,16 +35,17 @@ export function useCredentials() {
   const getQuery = useQuery({
     queryKey: ['dashboard', credentials?.userName],
     queryFn: async () => {
-      if (!credentials) throw new Error('undefined state should not be triggered')
+      if (!credentials) throw new Error('You have to login first')
 
       try {
-        return await getData({ ...credentials! })
+        return await getData({ ...credentials })
       } catch (error) {
-        window.api.send('log', error)
+        window.api.send('error', error)
         const data = await login({
           number: credentials.userName,
           password: credentials.password
         })
+        window.api.send('log', 'login')
         return await getData(await handleLogin(data, credentials!.password, credentials.saved))
       }
     },
@@ -78,10 +79,22 @@ export function useCredentials() {
 
     return credentials
   }
-
+  const retry = async () => {
+    setLoadingCredentials(true)
+    const saved = await SecureStorage.getSavedCredentials<SavedData>()
+    if (saved.success && saved.data) {
+      dispatch(CredentialActions.setData({ ...saved.data, saved: true }))
+    }
+    return new Promise((res) => {
+      setTimeout(async () => {
+        setLoadingCredentials(false)
+        res()
+      }, 1000)
+    })
+  }
   const handleLogout = async () => {
     await SecureStorage.clearSession()
     dispatch(CredentialActions.setData(null))
   }
-  return { isLoadingCredentials, credentials, getQuery, handleLogin, handleLogout, isOnline }
+  return { isLoadingCredentials, credentials, retry, getQuery, handleLogin, handleLogout, isOnline }
 }

@@ -3,7 +3,6 @@ import { Api as ApiMain } from '@renderer/mini'
 import { ipcMain } from 'electron'
 import { ObjectEntries } from '@utils/index'
 import { showMiniWindow, hideMiniWindow, toggleMiniWindow, closeMiniWindow } from '.'
-import { MainWindow } from '../main/window'
 import { showMainWindow } from '../main'
 
 type OnMethodsType = {

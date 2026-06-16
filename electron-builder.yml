@@ -7,34 +7,11 @@ files:
   - build/**/*
 asarUnpack:
   - resources/**
+
 win:
   executableName: we-quota
-nsis:
-  allowElevation: true
-  allowToChangeInstallationDirectory: true
-  artifactName: temp.${ext}
-  createDesktopShortcut: always
-  oneClick: false  # Set to true if you want one-click installation
-  perMachine: true  # Choose per-machine installation mode
-  createStartMenuShortcut: true  # Creates a start menu shortcut
-  shortcutName: ${productName}
-mac:
-  entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-  notarize: false
-dmg:
-  artifactName: ${name}-${version}.${ext}
-linux:
   target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
+    - dir
 appImage:
   artifactName: ${name}-${version}.${ext}
-npmRebuild: false
+npmRebuild: true

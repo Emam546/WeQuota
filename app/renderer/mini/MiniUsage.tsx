@@ -78,6 +78,7 @@ export default function MiniUsage({
               <WifiOff size={24} className="text-red-400" />
             </div>
             <div className="text-sm text-center text-white/80">No connection</div>
+            {error}
             {onRetry && (
               <button
                 onClick={onRetry}

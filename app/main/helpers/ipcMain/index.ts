@@ -21,6 +21,9 @@ export const OnMethods: OnMethodsType = {
   log(_, arg: string) {
     logger.info(arg)
   },
+  error(_, error) {
+    logger.err(error, true)
+  },
   setTitle: function (event, name: string): void {
     const window = BrowserWindow.fromWebContents(event.sender)
     if (!window) return

@@ -4,7 +4,7 @@
 #define MyAppVersion "0.0.1"
 #define MyAppPublisher "Imam Ashour"
 #define MyAppURL "https://github.com/Emam546/youtube-downloader"
-#define MyAppExeName "We-Quota-App.exe"
+#define MyAppExeName "We-quota.exe"
 #define MyAppAssocName MyAppName + " setup"
 #define MyAppAssocExt ".myp"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt

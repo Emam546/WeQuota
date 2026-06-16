@@ -15,6 +15,7 @@ type ConvertToIpCHandleMainFunc<T extends (...args: any[]) => any> = (
 export namespace ApiMain {
   interface OnMethods {
     log(...args: any[]): void
+    error(...error: Error[]): void
     setTitle(name: string): void
     closeWindow(): void
 

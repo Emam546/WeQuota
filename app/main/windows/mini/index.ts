@@ -19,7 +19,6 @@ export async function createMiniWindow(
     frame: false,
     // transparent: true,
     skipTaskbar: true,
-    show: false,
 
     webPreferences: {
       sandbox: false,
@@ -51,7 +50,7 @@ export async function createMiniWindow(
   const primaryDisplay = screen.getPrimaryDisplay()
   const { width: screenWidth } = primaryDisplay.workAreaSize
 
-  const [windowWidth, windowHeight] = win.getSize()
+  const [windowWidth] = win.getSize()
 
   win.setPosition(
     screenWidth - windowWidth - MARGIN, // right
@@ -81,6 +80,7 @@ export async function showMiniWindow() {
     miniWindow.show()
     miniWindow.focus()
   }
+  throw new Error('the miniWindow is destroyed')
 }
 
 export function hideMiniWindow() {
