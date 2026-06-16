@@ -5,9 +5,12 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <title>We Quota App</title>
-        <link rel="icon" href="/images/logo.png" type="image/png" />
+        {/* Use absolute root-relative path for favicon so Next serves it correctly */}
+        <link rel="icon" href="/favicon.ico" />
         {/* <!-- Fonts --> */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <meta
           content="WE
