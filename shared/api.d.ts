@@ -15,7 +15,7 @@ type ConvertToIpCHandleMainFunc<T extends (...args: any[]) => any> = (
 export namespace ApiMain {
   interface OnMethods {
     log(...args: any[]): void
-    error(...error: Error[]): void
+    error(error: unknown): void
     setTitle(name: string): void
     closeWindow(): void
 
@@ -32,8 +32,8 @@ export namespace ApiMain {
   interface OnceMethods {}
   interface HandleMethods {
     clearCredentials(): void
-    saveCredentials(username: string, data: string): void
-    getCredentials<T>(username: string): T
+    saveCredentials(username: string, data: unknown): void
+    getCredentials<T>(): unknown
     saveFile(data: Buffer, filename: string): Promise<boolean>
   }
   interface HandleOnceMethods {}

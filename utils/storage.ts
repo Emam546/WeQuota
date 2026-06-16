@@ -34,9 +34,10 @@ export const SecureStorage = {
   },
 
   /** Retrieves credentials for auto-login */
-  async getSavedCredentials<T>() {
+  async getSavedCredentials<T>(): Promise<{ success: false } | { success: true; data: T | null }> {
     if (window.Environment == 'desktop') {
-      return await window.api.invoke('getCredentials')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (await window.api.invoke('getCredentials')) as any
     } else {
       const isAutoLoginEnabled = localStorage.getItem(STORAGE_KEYS.AUTO_LOGIN) === 'true'
       const username = localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
@@ -45,7 +46,6 @@ export const SecureStorage = {
         const secret = localStorage.getItem(`${SERVICE_NAME}_${username}_secret`)
         return {
           success: true,
-          username,
           data: secret ? (JSON.parse(atob(secret)) as T) : null
         }
       }

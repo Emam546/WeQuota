@@ -85,7 +85,7 @@ export function useCredentials() {
     if (saved.success && saved.data) {
       dispatch(CredentialActions.setData({ ...saved.data, saved: true }))
     }
-    return new Promise((res) => {
+    return new Promise<void>((res) => {
       setTimeout(async () => {
         setLoadingCredentials(false)
         res()

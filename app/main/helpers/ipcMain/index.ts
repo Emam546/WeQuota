@@ -108,15 +108,11 @@ export const HandleMethods: HandelMethodsType = {
   saveCredentials: function (_, username: string, data?: unknown): void {
     fs.writeFileSync(filePath, btoa(JSON.stringify(data)))
   },
-  getCredentials: function <T>(
-    event: Electron.CrossProcessExports.IpcMainInvokeEvent,
-    username: string
-  ): { success: false } | { success: true; data: T; username: string } {
+  getCredentials: function <T>() {
     if (fs.existsSync(filePath))
       return {
         success: true,
-        username,
-        data: JSON.parse(atob(fs.readFileSync(filePath).toString()))
+        data: JSON.parse(atob(fs.readFileSync(filePath).toString())) as T
       }
     return { success: false }
   },
