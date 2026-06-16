@@ -15,29 +15,22 @@ export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
   useEffect(() => {
-    if (!isLoadingCredentials && !credentials) {
-      router.replace('/login')
-    }
+    if (!isLoadingCredentials && !credentials) router.replace('/login')
   }, [isLoadingCredentials, credentials])
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout | undefined
-
-    if (getQuery.isPending) {
+    if (getQuery.isFetching && !getQuery.isLoading) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsRefreshing(true)
     } else if (isRefreshing) {
-      timeoutId = setTimeout(() => {
-        setIsRefreshing(false)
+      const timeoutId = setTimeout(() => {
         setRefreshKey((prev) => prev + 1)
+        setIsRefreshing(false)
       }, 1000)
-    }
-
-    return () => {
-      if (timeoutId) {
+      return () => {
         clearTimeout(timeoutId)
       }
     }
-  }, [getQuery.isPending])
+  }, [getQuery.isFetching])
   const demoData = getQuery.data
   // Show NoInternet if there's an error or no data
   useEffect(() => {
