@@ -10,11 +10,13 @@
     "app",
     "./components",
     "src",
+    "shared"
   ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",
     "skipLibCheck": true,
+    "rootDir": "./",
     "paths": {
       "@components/*": [
         "./components/*"

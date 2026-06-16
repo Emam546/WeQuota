@@ -71,6 +71,7 @@ export const HandleMethods: HandelMethodsType = {
       logger.info(`Auto-launch enabled: ${enabled}`)
       return enabled ?? false
     } catch (error) {
+      console.error(error)
       logger.err('Failed to enable auto-launch', true)
       return false
     }

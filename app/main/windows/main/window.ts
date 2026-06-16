@@ -10,5 +10,7 @@ export class MainWindow extends BrowserWindow {
         MainWindow.MainWindow = null
       })
     }
+
+  
   }
 }

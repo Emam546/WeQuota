@@ -12,14 +12,12 @@ import { isDev } from '@main/utils'
 import { convertFunc } from '@main/utils/convert'
 import { Context } from '@src/index'
 import { MainWindow } from './window'
-import serve from 'electron-serve'
 import { isProd } from '../../utils'
+import serve from 'electron-serve'
 
-const appServe = isProd
-  ? serve({
-      directory: path.join(__dirname, '../next')
-    })
-  : null
+const appServe = serve({
+  directory: path.join(__dirname, '../next')
+})
 export async function createWindow(
   options: BrowserWindowConstructorOptions,
   preloadData?: Context
@@ -34,6 +32,8 @@ export async function createWindow(
     frame: false,
     width: 500,
     height: 700,
+    icon: 'build/icon.ico',
+
     webPreferences: {
       ...options.webPreferences,
       sandbox: false,
@@ -65,6 +65,9 @@ export async function createWindow(
     } else await win.webContents.loadFile(path.join(__dirname, '../windows/404.html'))
   })
   win.on('resize', () => {
+    titleBarView.webContents.send('onToggleWindowState', win.isMaximized())
+  })
+  win.on('resize', () => {
     const bounds = win.getContentBounds()
 
     titleBarView.setBounds({
@@ -85,7 +88,6 @@ export async function createWindow(
     await titleBarView.webContents.loadURL(
       `${process.env['ELECTRON_RENDERER_URL'] as string}/frame/index.html`
     )
-    win.webContents.openDevTools()
 
     win.webContents.on('did-fail-load', () => {
       win.webContents.reloadIgnoringCache()

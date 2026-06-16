@@ -21,19 +21,7 @@ export default function Login() {
   const { register, handleSubmit, formState, setError } = useForm<FieldValues>()
   const isLoading = formState.isSubmitting
   const [showPassword, setShowPassword] = useState(false)
-  const [captchaModal, setCaptchaModal] = useState<{
-    isOpen: boolean
-    captchaImage: string
-    token: string
-    number: string
-    resolve: (result: { token: string; imgCode: string } | null) => void
-  }>({
-    isOpen: false,
-    captchaImage: '',
-    token: '',
-    number: '',
-    resolve: () => {}
-  })
+
   useEffect(() => {
     if (getQuery.error) setError('root', { message: getQuery.error?.message })
   }, [getQuery.error])
@@ -42,33 +30,13 @@ export default function Login() {
     if (window.Environment !== 'desktop') return
 
     try {
-      if (enabled) {
-        const result = await window.api.invoke('enableAutoLaunch')
-      } else {
-        const result = await window.api.invoke('disableAutoLaunch')
-      }
+      if (enabled) await window.api.invoke('enableAutoLaunch')
+      else await window.api.invoke('disableAutoLaunch')
     } catch (error) {
       console.error('Failed to toggle auto-launch:', error)
     }
   }
 
-  useEffect(() => {
-    const handleCaptcha = (event: CustomEvent) => {
-      const { image, token, number, resolve } = event.detail
-      setCaptchaModal({
-        isOpen: true,
-        captchaImage: image,
-        token,
-        number,
-        resolve
-      })
-    }
-
-    window.addEventListener('show-captcha', handleCaptcha as EventListener)
-    return () => {
-      window.removeEventListener('show-captcha', handleCaptcha as EventListener)
-    }
-  }, [])
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-white sm:p-6 lg:p-8">
       <motion.div
@@ -77,11 +45,11 @@ export default function Login() {
         className="w-full max-w-sm space-y-6 sm:max-w-md lg:max-w-lg sm:space-y-8"
       >
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-blue-600 border border-blue-100 shadow-sm sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-blue-50 sm:mb-6">
-            <Wifi size={24} />
+          <div className="inline-flex items-center justify-center w-20 mb-4 sm:w-14 lg:w-20 rounded-xl sm:rounded-2xl sm:mb-6 aspect-square">
+            <img src="/images/icon.svg" alt="logo" />
           </div>
           <h1 className="text-xl font-bold tracking-tight sm:text-2xl lg:text-2xl text-slate-900">
-            NetQuota Login
+            We Quota Login
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-slate-500">
             Manage your connection and startup preferences.
@@ -161,6 +129,7 @@ export default function Login() {
                 <input
                   id="startup"
                   type="checkbox"
+                  defaultChecked
                   {...register('autoLunch')}
                   onChange={(e) => handleAutoLaunchChange(e.target.checked)}
                   className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
@@ -217,33 +186,6 @@ export default function Login() {
           </button>
         </form>
       </motion.div>
-
-      <CaptchaModal
-        isOpen={captchaModal.isOpen}
-        captchaImage={captchaModal.captchaImage}
-        token={captchaModal.token}
-        refresh={async () => {
-          const res = await axios.post('/api/login/captcha', { number: captchaModal.number })
-          const data = res.data
-          if (data.status == 'Success') {
-            if (data.requireInteraction) return data
-            else {
-              captchaModal.resolve({ token: data.token, imgCode: '' })
-              setCaptchaModal((prev) => ({ ...prev, isOpen: false }))
-            }
-          }
-          return { captcha: '', token: '' }
-        }}
-        // number={captchaModal.number}
-        onSubmit={(solution) => {
-          captchaModal.resolve({ token: solution.token, imgCode: solution.code })
-          setCaptchaModal((prev) => ({ ...prev, isOpen: false }))
-        }}
-        onClose={() => {
-          setCaptchaModal((prev) => ({ ...prev, isOpen: false }))
-          captchaModal.resolve(null)
-        }}
-      />
     </div>
   )
 }

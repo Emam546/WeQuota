@@ -2,7 +2,7 @@ import './helpers/ipcMain'
 import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow, showMainWindow } from './windows/main'
-import { createMiniWindow, showMiniWindow } from './windows/mini';
+import { createMiniWindow, showMiniWindow } from './windows/mini'
 import path from 'path'
 
 // Check if app was started at login (auto-launch)
@@ -16,7 +16,7 @@ let tray: Tray | null = null
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.weQuota')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -26,7 +26,7 @@ app.whenReady().then(async () => {
   })
   await createMiniWindow()
   if (!isAutoStarted) await createWindow({})
-  showMiniWindow()
+  await showMiniWindow()
   // Create system tray
   const trayIcon = nativeImage.createFromPath(path.join(__dirname, '../../resources/icon.png'))
   tray = new Tray(trayIcon.resize({ width: 16, height: 16 }))

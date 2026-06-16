@@ -5,26 +5,24 @@ import UserInfo from '../components/pages/UserInfo'
 import UsageAndBalance from '../components/pages/UsageAndBalance'
 import { useCredentials } from '@utils/useCredentials'
 import { useRouter } from 'next/router'
-
 type Page = 'usage' | 'userInfo'
 
 export default function Dashboard() {
   const { getQuery, handleLogout, isLoadingCredentials, credentials } = useCredentials()
-  const __isRefreshing = getQuery.isPending
   const [currentPage, setCurrentPage] = useState<Page>('usage')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(__isRefreshing)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
   useEffect(() => {
     if (!isLoadingCredentials && !credentials) {
-       router.replace('/login')
+      router.replace('/login')
     }
-  }, [isLoadingCredentials])
+  }, [isLoadingCredentials, credentials])
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | undefined
 
-    if (__isRefreshing) {
+    if (getQuery.isRefetching) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsRefreshing(true)
     } else if (isRefreshing) {
@@ -39,7 +37,7 @@ export default function Dashboard() {
         clearTimeout(timeoutId)
       }
     }
-  }, [__isRefreshing])
+  }, [getQuery.isRefetching])
   const demoData = getQuery.data
   // Show NoInternet if there's an error or no data
   useEffect(() => {
