@@ -27,7 +27,7 @@ export function useInternetStatus() {
 
   return isOnline
 }
-export function useCredentials() {
+export function useCredentials(showCaptcha: boolean = true) {
   const credentials = useAppSelector((state) => state.credentials)
   const dispatch = useDispatch()
   const isOnline = useInternetStatus()
@@ -41,10 +41,13 @@ export function useCredentials() {
         return await getData({ ...credentials })
       } catch (error) {
         window.api.send('error', error)
-        const data = await login({
-          number: credentials.userName,
-          password: credentials.password
-        })
+        const data = await login(
+          {
+            number: credentials.userName,
+            password: credentials.password
+          },
+          showCaptcha
+        )
         window.api.send('log', 'login')
         return await getData(await handleLogin(data, credentials!.password, credentials.saved))
       }

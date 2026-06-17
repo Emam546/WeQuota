@@ -4,7 +4,7 @@ import { useCredentials } from '@utils/useCredentials'
 import { useFitWindow } from '@utils/hooks'
 
 export default function App() {
-  const { getQuery, isLoadingCredentials, credentials, retry } = useCredentials()
+  const { getQuery, isLoadingCredentials, credentials, retry } = useCredentials(false)
   const ref = useFitWindow<HTMLDivElement>([])
   useEffect(() => {
     if (!isLoadingCredentials && !credentials) {

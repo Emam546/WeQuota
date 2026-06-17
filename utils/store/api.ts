@@ -59,13 +59,20 @@ export function getFunctionInvoke<K extends keyof Api.HandleMethods>(
   const fn = FunctionData[key] as (...args: unknown[]) => unknown
   return fn(...params) as any
 }
-export async function login(data: Parameters<ApiMain.HandleMethods['login']>[0]) {
+export async function login(
+  data: Parameters<ApiMain.HandleMethods['login']>[0],
+  showCaptcha: boolean
+) {
   let infoToken: { imgCode: string; token: string } | null = null
   while (true) {
-    const result: LoginResponse = await getFunctionInvoke('login', { ...data, ...(infoToken ?? {}) })
+    const result: LoginResponse = await getFunctionInvoke('login', {
+      ...data,
+      ...(infoToken ?? {})
+    })
     if (result.status == 'Blocked') throw new Error('You have been blocked')
 
     if (result.requireInteraction) {
+      if (!showCaptcha) throw new Error('Unsolved captcha')
       const res: { token: string; imgCode: string } | null = await getFunctionInvoke(
         'solveCaptcha',
         result.captcha,
@@ -76,6 +83,7 @@ export async function login(data: Parameters<ApiMain.HandleMethods['login']>[0])
       infoToken = res
       continue
     }
+
     if (result.data.header.retCode != '0') {
       if (hasProperty(result.data.header, 'errorNo'))
         throw throwError(result.data.header.errorNo, result.data.header.errorMsg)
