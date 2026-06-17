@@ -4,18 +4,27 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import path from 'path'
 import { createWindow, showMainWindow } from './windows/main'
 import { createMiniWindow, showMiniWindow } from './windows/mini'
+import { logger } from './helpers/logger'
 
 // Check if app was started at login (auto-launch)
-const loginItemSettings = app.getLoginItemSettings()
-const isAutoStarted = loginItemSettings.openAtLogin && loginItemSettings.wasOpenedAtLogin
-
+const loginItemSettings = app.getLoginItemSettings({
+  path: app.getPath('exe'),
+  args: ['--auto-start']
+})
+const isAutoStarted = loginItemSettings.wasOpenedAtLogin
+const isStartupLaunch = process.argv.includes('--auto-start')
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.WeQuota')
-
+  const startupEnabled =
+    loginItemSettings.openAtLogin || loginItemSettings.executableWillLaunchAtLogin
+  logger.info(`start up enabled  ,${startupEnabled}`)
+  logger.info(`is started up, ${isAutoStarted}`)
+  logger.info(`is start up ${isStartupLaunch}`)
+  logger.info(`start up args ${JSON.stringify(process.argv)}`)
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -23,7 +32,7 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
   await createMiniWindow()
-  if (!isAutoStarted) await createWindow({})
+  if (!(isAutoStarted || isStartupLaunch)) await createWindow({})
   // Create system tray
   const trayIcon = nativeImage.createFromPath(path.join(__dirname, '../../build/icon.ico'))
   const tray = new Tray(trayIcon.resize({ width: 16, height: 16 }))
@@ -50,13 +59,6 @@ app.whenReady().then(async () => {
   // Double-click to toggle mini window
   tray.on('double-click', async () => {
     showMiniWindow()
-  })
-  // IPC test
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow({})
   })
 })
 

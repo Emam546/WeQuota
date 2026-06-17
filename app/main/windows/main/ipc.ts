@@ -62,31 +62,34 @@ export const HandleMethods: HandelMethodsType = {
     return getSubscriberData(...args)
   },
   async enableAutoLaunch() {
-    const autoLauncher = new AutoLaunch({
-      name: app.getName(),
-      path: app.getPath('exe')
-    })
-    const enabled = await autoLauncher.enable()
-    logger.info(`Auto-launch enabled: ${enabled}`)
-    return enabled ?? false
+    if (app.isPackaged)
+      app.setLoginItemSettings({
+        openAtLogin: true,
+        enabled: true,
+        path: app.getPath('exe'),
+        name: app.getName(),
+        args: ['--auto-start']
+      })
+
+    return true
   },
   async disableAutoLaunch() {
-    const autoLauncher = new AutoLaunch({
+    app.setLoginItemSettings({
+      openAtLogin: false,
+      path: app.getPath('exe'),
       name: app.getName(),
-      path: app.getPath('exe')
+      args: ['--auto-start']
     })
-    const disabled = await autoLauncher.disable()
-    logger.info(`Auto-launch disabled: ${disabled}`)
-    return disabled ?? false
+    return true
   },
   async isAutoLaunchEnabled() {
     try {
-      const autoLauncher = new AutoLaunch({
-        name: app.getName(),
-        path: app.getPath('exe')
+      const loginItemSettings = app.getLoginItemSettings({
+        path: app.getPath('exe'),
+        args: ['--auto-start']
       })
-      const enabled = await autoLauncher.isEnabled()
-      return enabled
+      logger.info(loginItemSettings.openAtLogin)
+      return loginItemSettings.openAtLogin || loginItemSettings.executableWillLaunchAtLogin
     } catch (error) {
       logger.err('Failed to check auto-launch status', true)
       logger.err(error, true)
