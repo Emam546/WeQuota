@@ -3,7 +3,7 @@ import { HardDrive, Wallet, TrendingUp, Maximize2, X, Loader2, WifiOff } from 'l
 import { DemoData } from '../../../src/types'
 import style from './style.module.scss'
 import classNames from 'classnames'
-
+import image from './assets/icon.png'
 interface MiniUsageProps {
   data: DemoData | null
   isLoading?: boolean
@@ -42,10 +42,12 @@ export default function MiniUsage({
         )}
       >
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-6 h-6 bg-blue-500 rounded-lg">
-            <HardDrive size={14} className="text-white" />
+          <div className="flex items-center justify-center w-6 h-6">
+            {/* <HardDrive size={14} className="text-white" /> */}
+            <img src={image} alt="logo" className="w-full" />
+            {/* {image} */}
           </div>
-          <span className="text-xs font-semibold">NetQuota</span>
+          <span className="text-xs font-semibold">We Quota</span>
         </div>
         <div className="flex items-center gap-1">
           <button
