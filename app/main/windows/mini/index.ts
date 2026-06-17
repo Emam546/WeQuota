@@ -17,9 +17,9 @@ export async function createMiniWindow(
     maximizable: false,
     minimizable: true,
     frame: false,
-    // transparent: true,
+    transparent: true,
     skipTaskbar: true,
-
+    show: false,
     webPreferences: {
       sandbox: false,
       preload: path.join(__dirname, '../preload/index.js'),
@@ -56,6 +56,7 @@ export async function createMiniWindow(
     screenWidth - windowWidth - MARGIN, // right
     MARGIN // top
   )
+  win.show()
   return win
 }
 
