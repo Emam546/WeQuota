@@ -64,10 +64,13 @@ export default function Login() {
         <form
           onSubmit={handleSubmit(async (data) => {
             try {
-              const result = await login({
-                number: data.number.slice(1),
-                password: data.password
-              })
+              const result = await login(
+                {
+                  number: data.number.slice(1),
+                  password: data.password
+                },
+                true
+              )
               await handleLogin(result, data.password, data.saveCredentials)
               try {
                 await handleAutoLaunchChange(data.autoLunch)
