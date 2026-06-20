@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { HardDrive, Wallet, TrendingUp, Maximize2, X, Loader2, WifiOff } from 'lucide-react'
+import { HardDrive, Wallet, TrendingUp, Maximize2, X, Loader2, WifiOff, RotateCw } from 'lucide-react'
 import { DemoData } from '../../../src/types'
 import style from './style.module.scss'
 import classNames from 'classnames'
@@ -50,6 +50,16 @@ export default function MiniUsage({
           <span className="text-xs font-semibold">We Quota</span>
         </div>
         <div className="flex items-center gap-1">
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              disabled={isLoading}
+              className="p-1.5 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+              title="Reload"
+            >
+              <RotateCw size={14} className={classNames(isLoading && 'animate-spin')} />
+            </button>
+          )}
           <button
             onClick={onOpenMain}
             className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"
